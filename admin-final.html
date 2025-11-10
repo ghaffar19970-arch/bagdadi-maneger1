@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>البغدادي — لوحة المدير</title>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- html2canvas للصورة -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800&display=swap');
+  :root{
+    --orange:#f97316; --orange-50:#fff7ed; --orange-600:#ea580c;
+    --dark:#0f172a; --muted:#64748b;
+    --green:#16a34a; --yellow:#f59e0b; --red:#dc2626; --violet:#8b5cf6; --blue:#3b82f6;
+    --card:#ffffff; --border:#e5e7eb;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow-x:hidden;font-family:'Cairo',sans-serif;background:var(--orange-50);color:#111827}
+  /* شاشة الدخول (برتقالي) */
+  #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#fb923c,#f97316,#ea580c)}
+  .login-card{width:100%;max-width:420px;background:#fff;border-radius:18px;padding:24px;box-shadow:0 18px 46px rgba(0,0,0,.18);text-align:center}
+  .logo-box{background:linear-gradient(135deg,#fb923c,#f97316);color:#fff;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+  .logo-icon{background:#fff;color:#ea580c;display:inline-grid;place-items:center;width:54px;height:54px;border-radius:50%;font-size:26px;margin-bottom:8px}
+  .logo-box h1{margin:0;font-size:24px;font-weight:800}
+  .logo-box p{margin:0;opacity:.95}
+  .login-card h2{margin:8px 0 14px}
+  .inp{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-size:15px;margin:7px 0}
+  .inp:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,.18)}
+  .btn{width:100%;padding:12px;border:0;border-radius:12px;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;font-weight:800;cursor:pointer}
+  .small{font-size:12px;color:#6b7280;margin-top:10px}
+  .msg{margin-top:8px} .ok{color:var(--green)} .err{color:var(--red)}
+
+  /* التطبيق */
+  #app{display:none;min-height:100vh}
+  header{position:sticky;top:0;z-index:6;background:#fff;border-bottom:1px solid var(--border);
+    padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand .badge{display:inline-block;border:3px solid var(--orange);color:var(--orange);
+    border-radius:12px;padding:10px 14px;font-weight:800;background:#fff}
+  .who{background:#fff;border:1px solid #ffd8b6;border-radius:999px;padding:6px 10px;font-size:13px}
+  .menu-btn{background:#fff;border:1px solid #ffe0c2;color:var(--orange);border-radius:10px;padding:8px 12px;cursor:pointer}
+
+  /* القائمة اليمنى */
+  .sidebar{position:fixed;inset:0 0 0 auto;width:0;max-width:300px;background:#0d0f12;color:#fff;transition:width .25s;overflow:hidden;z-index:20}
+  .sidebar.open{width:88%}
+  .sidebar-header{padding:18px;border-bottom:1px solid #1e293b}
+  .sidebar-user{margin-top:8px;font-size:13px;opacity:.85}
+  .nav a{display:block;color:#fff;text-decoration:none;padding:12px 18px;border-bottom:1px solid #111827}
+  .nav a:hover{background:#111827}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:15}
+  .overlay.show{display:block}
+
+  /* المحتوى + القوائم */
+  .content{padding:12px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
+  .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+  .tab{white-space:nowrap;border:1px solid var(--border);border-radius:999px;padding:8px 12px;cursor:pointer;background:#fff}
+  .tab.active{background:var(--orange);color:#fff;border-color:transparent}
+  .pill-count{background:rgba(255,255,255,.25);padding:2px 8px;border-radius:999px;margin-inline-start:6px}
+  .orders{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+  .order-card{border-radius:12px;padding:12px;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .order-card p{margin:4px 0}
+  .actions .btnx{border:0;border-radius:10px;padding:8px 10px;margin:4px 3px;cursor:pointer}
+  .btnx-green{background:var(--green);color:#fff}
+  .btnx-yellow{background:var(--yellow);color:#111}
+  .btnx-red{background:var(--red);color:#fff}
+  .btnx-gray{background:#334155;color:#fff}
+  .pending{background:var(--blue)}
+  .temp{background:#facc15;color:#111}
+  .delayed{background:var(--violet)}
+  .rejected{background:var(--red)}
+  .delivered{background:#22c55e}
+
+  /* البحث */
+  .search-bar{display:flex;gap:8px}
+  .search-bar input{flex:1}
+
+  /* الأرشيف رمادي */
+  .arch-card{background:#eee;color:#111;border:1px solid #ddd}
+
+  /* تقرير المحاسبة (مخفي — يُبنى داخل JS) */
+  #accReportWrapper{display:none}
+  #accReport{
+    background:#fff; padding:20px; margin:0 auto; border-radius:12px;
+    width:900px; box-shadow:0 4px 12px rgba(0,0,0,.2); font-family:"Tahoma",sans-serif;
+  }
+  #accReport h2{ margin:0 0 20px; color:#f97316; text-align:center }
+  .top-boxes{display:flex; justify-content:space-between; gap:10px; margin-bottom:20px; }
+  .box-group{display:flex; gap:10px; flex:1}
+  .box{flex:1; background:#f97316; color:#fff; padding:10px; border-radius:8px; font-size:14px; font-weight:bold; text-align:center}
+  #accReport table{width:100%; border-collapse:collapse; font-size:14px; margin-top:15px}
+  #accReport th, #accReport td{ border:1px solid #ccc; padding:8px; text-align:center }
+  #accReport th{ background:#f97316; color:#fff }
+  #accReport .footer{margin-top:15px; text-align:right; font-size:14px; font-weight:bold}
+  audio{display:none}
+
+  /* small helpers */
+  .muted{color:var(--muted)}
+  .link-like{color:#0ea5e9; text-decoration:underline; cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- شاشة الدخول -->
+<section id="loginScreen">
+  <div class="login-card">
+    <div class="logo-box">
+      <div class="logo-icon">🚚</div>
+      <h1>البغدادي</h1>
+      <p>للتوصيل السريع</p>
+    </div>
+    <h2>تسجيل الدخول</h2>
+    <input id="loginUser" class="inp" placeholder="user (مثال: ibrahim)">
+    <input id="loginPass" class="inp" type="password" placeholder="كلمة المرور">
+    <button id="doLogin" class="btn">تسجيل الدخول</button>
+    <div id="loginMsg" class="msg"></div>
+    <div class="small">© 2025 البغدادي للتوصيل السريع</div>
+  </div>
+</section>
+
+<!-- التطبيق -->
+<section id="app">
+  <header>
+    <button id="openMenu" class="menu-btn">☰</button>
+    <div class="brand"><span class="badge">البغدادي — للتوصيل السريع</span></div>
+    <div id="whoami" class="who"></div>
+  </header>
+
+  <!-- قائمة يمين -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <span class="badge">القائمة</span>
+      <div id="sidebarUser" class="sidebar-user"></div>
+    </div>
+    <nav class="nav">
+      <a href="#" data-page="home">🏠 الرئيسية</a>
+      <a href="#" data-page="mandoubs">👥 المندوبون</a>
+      <a href="#" data-page="search">🔎 البحث</a>
+      <a href="#" data-page="archive">📦 الأرشيف</a>
+      <a href="#" data-page="notifications">🔔 الإشعارات</a>
+      <a href="#" data-page="addOrder">➕ إضافة طلب</a>
+      <a href="#" data-page="addMandoub">🆕 إضافة مندوب</a>
+      <a href="#" data-page="people">🗂️ الموظفون والمندوبون</a>
+      <!-- new: about -->
+      <a href="#" data-page="about">ℹ️ حول التطبيق</a>
+      <a href="#" id="logoutBtn">🚪 تسجيل الخروج</a>
+    </nav>
+  </aside>
+  <div id="overlay" class="overlay"></div>
+
+  <main class="content" id="content"></main>
+</section>
+
+<!-- عنصر التقرير (مخفي) لبناء الصورة -->
+<div id="accReportWrapper">
+  <div id="accReport">
+    <h2>🚚 البغدادي للتوصيل السريع</h2>
+    <div class="top-boxes">
+      <div class="box-group">
+        <div class="box" id="bxTotal">المبلغ الكلي: 0</div>
+        <div class="box" id="bxFees">الأجور: 0</div>
+        <div class="box" id="bxNet">الصافي: 0</div>
+      </div>
+      <div class="box-group">
+        <div class="box" id="bxOp">رقم العملية: -</div>
+        <div class="box" id="bxDate">التاريخ: -</div>
+        <div class="box" id="bxCount">عدد الطلبات: 0</div>
+      </div>
+    </div>
+    <table id="accTable">
+      <thead>
+        <tr>
+          <th>تسلسل</th>
+          <th>رقم الطلب</th>
+          <th>اسم الشركة</th>
+          <th>المحافظة</th>
+          <th>المنطقة</th>
+          <th>المبلغ الكلي</th>
+          <th>المبلغ الصافي</th>
+        </tr>
+      </thead>
+      <tbody id="accBody"></tbody>
+    </table>
+    <div class="footer" id="accFooter">اسم المندوب: - — اسم المحاسب: -</div>
+  </div>
+</div>
+
+<!-- تنبيه صوتي -->
+<audio id="beep" preload="auto" src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQAAACAA"></audio>
+
+<!-- Firebase -->
+<script type="module">
+/* ========== Firebase ========== */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import {
+  getFirestore, collection, query, where, getDocs, getDoc, addDoc, updateDoc, deleteDoc, doc,
+  onSnapshot, serverTimestamp, orderBy
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDmTFz_jU3HF8Jgb5wbpx_xtGvjBTPksOY",
+  authDomain: "bagdadi-delivery.firebaseapp.com",
+  projectId: "bagdadi-delivery",
+  storageBucket: "bagdadi-delivery.appspot.com",
+  messagingSenderId: "957413017368",
+  appId: "1:957413017368:web:a9c7373f0cf3e95cbc806d"
+};
+const appFB = initializeApp(firebaseConfig);
+const db = getFirestore(appFB);
+
+/* ========== Helpers ========== */
+const $ = s => document.querySelector(s);
+const content = $('#content'); const overlay = $('#overlay'); const sidebar = $('#sidebar'); const beep=$('#beep');
+const fmtN = n => Number(n||0).toLocaleString('en-US');
+const apm = d => {let h=d.getHours(),m=(''+d.getMinutes()).padStart(2,'0'),ap=h>=12?'م':'ص';h=h%12||12;return `${h}:${m} ${ap}`;}
+function showMsg(id,msg,type){ const el = $('#'+id); el.className='msg '+type; el.textContent=msg; }
+function statusText(s){ return s==='pending'?'قيد التنفيذ': s==='temp'?'مؤقت': s==='delayed'?'مؤجل': s==='delivered'?'واصل':'مرفوض'; }
+function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
+function randOp(){ return Math.floor(100000+Math.random()*900000).toString(); }
+
+/* ========== قائمة جانبية ========== */
+$('#openMenu').onclick=()=>{sidebar.classList.add('open');overlay.classList.add('show');};
+overlay.onclick=()=>{sidebar.classList.remove('open');overlay.classList.remove('show');};
+sidebar.querySelectorAll('a[data-page]').forEach(a=>{
+  a.onclick=(e)=>{e.preventDefault();sidebar.classList.remove('open');overlay.classList.remove('show');showPage(a.dataset.page);}
+});
+
+/* ========== جلسة دخول ========== */
+function getSession(){ try { return JSON.parse(localStorage.getItem('session')||'null'); } catch { return null; } }
+function saveSession(obj){ try{ localStorage.setItem('session', JSON.stringify(obj)); }catch{} }
+function requireLogin(){
+  const ses=getSession();
+  if(!ses){ $('#loginScreen').style.display='flex'; $('#app').style.display='none'; }
+  else{ $('#loginScreen').style.display='none'; $('#app').style.display='block';
+    $('#whoami').textContent = `${ses.name||ses.user} • ${ses.role||''}`;
+    $('#sidebarUser').textContent = `${ses.name||ses.user} — ${ses.role||''}`;
+    // افتح صفحة الرئيسية افتراضيًا الآن
+    showPage('home');
+    // شغّل مراقبة الحالة (التحقق من الايقاف)
+    startStatusWatcher();
+  }
+}
+$('#doLogin').onclick = async ()=>{
+  const u=$('#loginUser').value.trim().toLowerCase(), p=$('#loginPass').value.trim();
+  if(!u||!p) return showMsg('loginMsg','⚠️ أدخل اسم المستخدم وكلمة المرور','err');
+  showMsg('loginMsg','جارِ التحقق…','ok');
+  try{
+    const qUser=query(collection(db,'users'), where('user','==',u), where('password','==',p));
+    const snap=await getDocs(qUser);
+    if(snap.empty) return showMsg('loginMsg','❌ بيانات الدخول غير صحيحة','err');
+    const d=snap.docs[0].data();
+    if(d.status === 'inactive'){
+      return showMsg('loginMsg','🚫 تم إيقاف حسابك مؤقتاً من قبل الإدارة التنفيذية','err');
+    }
+    const sess = { id:snap.docs[0].id, user:d.user, name:d.name||'', role:d.role||'', status:d.status||'active' };
+    saveSession(sess);
+    Swal.fire({icon:'success',title:`أهلًا ${d.name||d.user}`,timer:900,showConfirmButton:false});
+    requireLogin();
+  }catch(e){ showMsg('loginMsg','خطأ اتصال: '+e.message,'err'); }
+};
+$('#logoutBtn').onclick=(e)=>{
+  e.preventDefault();
+  Swal.fire({title:'تأكيد',text:'تسجيل الخروج؟',icon:'warning',showCancelButton:true,confirmButtonText:'نعم',cancelButtonText:'لا'})
+  .then(r=>{ if(r.isConfirmed){ localStorage.removeItem('session'); requireLogin(); }});
+};
+
+/* ========== status watcher (every 60s) ========== */
+let statusWatcher = null;
+function startStatusWatcher(){
+  if(statusWatcher) clearInterval(statusWatcher);
+  const ses = getSession();
+  if(!ses) return;
+  // also run immediate check
+  (async ()=>{
+    try{
+      const ref = doc(db,'users', ses.id);
+      const dd  = await getDoc(ref);
+      if(dd.exists() && dd.data().status === 'inactive'){
+        localStorage.removeItem('session');
+        Swal.fire('🚫 تم الإيقاف','تم تسجيل خروجك بقرار الإدارة التنفيذية','warning').then(()=> location.reload());
+      }
+    }catch{}
+  })();
+  statusWatcher = setInterval(async ()=>{
+    try{
+      const ref = doc(db,'users', ses.id);
+      const dd  = await getDoc(ref);
+      if(dd.exists() && dd.data().status === 'inactive'){
+        localStorage.removeItem('session');
+        Swal.fire('🚫 تم الإيقاف','تم تسجيل خروجك بقرار الإدارة التنفيذية','warning').then(()=> location.reload());
+      }
+    }catch{}
+  }, 60000); // كل دقيقة
+}
+
+/* ========== تبديل الصفحات ========== */
+async function showPage(p){
+  if(p==='home') return renderHome();
+  if(p==='mandoubs') return renderMandoubs();
+  if(p==='search') return renderSearch();
+  if(p==='archive') return renderArchive();
+  if(p==='notifications') return renderNotifications();
+  if(p==='addOrder') return renderAddOrder();
+  if(p==='addMandoub') return renderAddMandoub();
+  if(p==='people') return renderPeople();
+  if(p==='about') return renderAbout();
+}
+
+/* ========== الرئيسية (بطاقات إحصائية لكل مندوب) ========== */
+async function renderHome(){
+  // نجلب المندوبين
+  const mSnap = await getDocs(collection(db,'mandoubs'));
+  const mandoubs = [];
+  mSnap.forEach(d=> mandoubs.push({ id:d.id, ...(d.data()) }));
+
+  // نجلب الطلبات الحالية فقط (مو الأرشيف)
+  const oSnap = await getDocs(collection(db,'orders'));
+  const countsByMand = {}; // mandoubId -> {pending, delayed, delivered, rejected}
+  oSnap.forEach(d=>{
+    const o = d.data();
+    const mid = o.mandoubId;
+    if(!mid) return;
+    if(!countsByMand[mid]) countsByMand[mid] = { pending:0, delayed:0, delivered:0, rejected:0 };
+    const s = o.status || 'pending';
+    if(s==='pending') countsByMand[mid].pending++;
+    else if(s==='delayed') countsByMand[mid].delayed++;
+    else if(s==='delivered') countsByMand[mid].delivered++;
+    else if(s==='rejected') countsByMand[mid].rejected++;
+  });
+
+  // نبني الواجهة: بطاقة لكل مندوب مع العدادات + الإجمالي
+  let html = `<div class="card"><h3>الرئيسية — ملخص الطلبات لكل مندوب</h3><div class="muted">تحديث مباشر من النظام • الحالات الأربع + إجمالي</div></div>`;
+  html += `<div class="orders">`;
+
+  mandoubs.forEach(m=>{
+    const c = countsByMand[m.id] || { pending:0, delayed:0, delivered:0, rejected:0 };
+    const total = c.pending + c.delayed + c.delivered + c.rejected;
+    html += `
+      <div class="card" style="border-color:#ffd8b6;background:#fff;color:#111">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="font-weight:800">🏍️ ${m.name||'-'}</div>
+          <div class="muted">إجمالي: <b>${fmtN(total)}</b></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px">
+          <div style="background:#ede9fe;color:#4c1d95;border:1px solid #c4b5fd;border-radius:10px;padding:10px;text-align:center;font-weight:800">
+            قيد التنفيذ<br><span style="font-size:20px">${fmtN(c.pending)}</span>
+          </div>
+          <div style="background:#fef9c3;color:#854d0e;border:1px solid #fde68a;border-radius:10px;padding:10px;text-align:center;font-weight:800">
+            مؤجل<br><span style="font-size:20px">${fmtN(c.delayed)}</span>
+          </div>
+          <div style="background:#dcfce7;color:#065f46;border:1px solid #bbf7d0;border-radius:10px;padding:10px;text-align:center;font-weight:800">
+            واصل<br><span style="font-size:20px">${fmtN(c.delivered)}</span>
+          </div>
+          <div style="background:#fee2e2;color:#7f1d1d;border:1px solid #fecaca;border-radius:10px;padding:10px;text-align:center;font-weight:800">
+            رفض<br><span style="font-size:20px">${fmtN(c.rejected)}</span>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  if(mandoubs.length===0){
+    html += `<div class="card">لا توجد بيانات مندوبين لإظهارها</div>`;
+  }
+  html += `</div>`;
+
+  content.innerHTML = html;
+}
+
+/* ========== حول التطبيق ========== */
+async function renderAbout(){
+  content.innerHTML = `
+    <div class="card" style="border-color:#ffd8b6">
+      <h2 style="margin:6px 0;color:#ea580c">البغدادي للتوصيل السريع</h2>
+      <p><b>📍 العنوان:</b> العراق – الأنبار – قضاء هيت – ناحية البغدادي – الشارع العام</p>
+      <p><b>🏢 من نحن:</b> شركة مختصّة بنقل بضائع الشركات وتوصيلها من وإلى محافظة الأنبار. تأسست عام 2020 ونعمل على مدار 24 ساعة.</p>
+      <p><b>☎️ أرقام الشركة:</b> <a href="tel:07810433473">07810433473</a> — <a href="tel:07823789656">07823789656</a></p>
+      <p><b>👨‍💻 عن المطوّر:</b> تم البرمجة والتطوير بواسطة <b>المبرمج غفوري</b> — <a href="tel:07810433473">07810433473</a></p>
+    </div>
+  `;
+}
+
+/* ========== المندوبون + صفحة كل مندوب (مع المحاسبة صورة) ========== */
+async function renderMandoubs(){
+  const snap = await getDocs(collection(db,'mandoubs'));
+  let html = `<div class="card"><h3>المندوبون</h3></div><div class="orders">`;
+  snap.forEach(d=>{
+    const m=d.data();
+    html += `<div class="order-card" style="background:#fff;color:#111;border:1px solid var(--border)">
+      <p class="mname" data-id="${d.id}" data-name="${m.name}" style="font-weight:800;cursor:pointer">🏍️ ${m.name}</p>
+      <small>هاتف: ${m.phone||'-'} — يوزر: ${m.user||'-'}</small>
+    </div>`;
+  });
+  html += `</div>`;
+  content.innerHTML = html;
+
+  document.querySelectorAll('.mname').forEach(el=>{
+    el.onclick = ()=> renderMandoubPage(el.dataset.id, el.dataset.name);
+  });
+}
+
+async function renderMandoubPage(mandoubId, mandoubName){
+  content.innerHTML = `
+    <div class="card" id="mHead">
+      <h3 style="margin:8px 0">المندوب: ${mandoubName}</h3>
+      <div id="finLine" class="small">…</div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn" id="btnAccountingImg" style="flex:1;background:#4f46e5">📄 محاسبة المندوب (صورة)</button>
+        <button class="btn" id="btnArchive" style="flex:1;background:#16a34a">📦 ترحيل إلى الأرشيف</button>
+        <button class="btn" id="btnReset" style="flex:1;background:#dc2626">♻️ تصفير الملخص</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="tabs" id="orderTabs">
+        <div class="tab active" data-k="pending">قيد التنفيذ <span class="pill-count" id="mc-pending">0</span></div>
+        <div class="tab" data-k="temp">مؤقت لاتخاذ القرار <span class="pill-count" id="mc-temp">0</span></div>
+        <div class="tab" data-k="delayed">المؤجل <span class="pill-count" id="mc-delayed">0</span></div>
+        <div class="tab" data-k="delivered">الواصل <span class="pill-count" id="mc-delivered">0</span></div>
+        <div class="tab" data-k="rejected">الرفض <span class="pill-count" id="mc-rejected">0</span></div>
+      </div>
+      <div id="ordersWrap"></div>
+    </div>
+  `;
+
+  const mRef = doc(db,'mandoubs',mandoubId);
+  const mDoc = await getDoc(mRef);
+  let lastAccountingAt = mDoc.data()?.lastAccountingAt?.toDate?.() || null;
+  let lastResetAt = mDoc.data()?.lastResetAt?.toDate?.() || null;
+
+  const q1 = query(collection(db,'orders'), where('mandoubId','==', mandoubId));
+  onSnapshot(q1, (snap)=>{
+    let lists = { pending:[], temp:[], delayed:[], delivered:[], rejected:[] };
+    let total=0;
+    snap.forEach(d=>{
+      const o=d.data(); o._id=d.id; (lists[o.status||'pending']).push(o);
+      if(o.status==='delivered') total += Number(o.amount||0);
+    });
+    const fees = (lists.delivered.length)*1000, net= total - fees;
+    $('#finLine').innerHTML = `💰 المبلغ الكلي: <b>${fmtN(total)}</b> • الأجور: <b>${fmtN(fees)}</b> • الصافي: <b>${fmtN(net)}</b>
+      ${lastAccountingAt?` • آخر محاسبة: ${lastAccountingAt.toLocaleDateString()} ${apm(lastAccountingAt)}`:''}
+      ${lastResetAt?` • آخر تصفير: ${lastResetAt.toLocaleDateString()} ${apm(lastResetAt)}`:''}`;
+
+    ['pending','temp','delayed','delivered','rejected'].forEach(k=>$('#mc-'+k).textContent = (lists[k]||[]).length);
+
+    function draw(kind){
+      const arr = lists[kind]||[]; let html='';
+      if(!arr.length){ html = `<div class="card">لا توجد طلبات</div>`; }
+      else{
+        html = `<div class="orders">` + arr.map(o=>{
+          const cls = kind==='pending'?'pending':kind==='temp'?'temp':kind==='delayed'?'delayed':kind==='delivered'?'delivered':'rejected';
+          return `<div class="order-card ${cls}">
+            <p>📦 <b>وصل:</b> ${o.wasl||'-'}</p>
+            <p>📱 <span class="cust-phone" data-phone="${o.phone||''}" style="text-decoration:underline;cursor:pointer">${o.phone||'-'}</span> • 🏙️ ${o.gov||'-'} — ${o.area||'-'}</p>
+            <p>💵 ${fmtN(o.amount)} • الحالة: <b>${statusText(o.status)}</b></p>
+            ${o.managerNote? `<p>📝 ملاحظة: ${o.managerNote}</p>`:''}
+            ${o.reason? `<p>📌 سبب: ${o.reason}${o.newAmount?` — سعر جديد: ${fmtN(o.newAmount)}`:''}</p>`:''}
+            <div class="actions">
+              ${kind==='pending' ? `
+                <button class="btnx btnx-green" onclick="setDelivered('${o._id}')">✅ واصل</button>
+                <button class="btnx btnx-yellow" onclick="delayDirect('${o._id}')">⏳ مؤجل</button>
+                <button class="btnx btnx-red" onclick="askReject('${o._id}')">❌ رفض</button>
+                <button class="btnx btnx-gray" onclick="askNote('${o._id}')">📝 ملاحظة</button>
+                <button class="btnx btnx-red" onclick="askDelete('${o._id}')">🗑️ حذف</button>
+              ` : kind==='delivered' ? `
+                <button class="btnx btnx-gray" onclick="backToPending('${o._id}')">↩️ إرجاعه قيد</button>
+                <button class="btnx btnx-red" onclick="askDelete('${o._id}')">🗑️ حذف</button>
+              ` : kind==='delayed' ? `
+                <button class="btnx btnx-green" onclick="setDelivered('${o._id}')">✅ واصل</button>
+                <button class="btnx btnx-red" onclick="askReject('${o._id}')">❌ رفض</button>
+                <button class="btnx btnx-gray" onclick="backToPending('${o._id}')">↩️ إرجاعه قيد</button>
+                <button class="btnx btnx-red" onclick="askDelete('${o._id}')">🗑️ حذف</button>
+              ` : kind==='rejected' ? `
+                <button class="btnx btnx-green" onclick="setDelivered('${o._id}')">✅ واصل</button>
+                <button class="btnx btnx-yellow" onclick="delayDirect('${o._id}')">⏳ مؤجل</button>
+                <button class="btnx btnx-gray" onclick="backToPending('${o._id}')">↩️ إرجاعه قيد</button>
+                <button class="btnx btnx-red" onclick="askDelete('${o._id}')">🗑️ حذف</button>
+              ` : /* temp */ `
+                <button class="btnx btnx-green" onclick="approveTemp('${o._id}')">✅ موافق</button>
+                <button class="btnx btnx-gray" onclick="backToPending('${o._id}')">↩️ كلا (إرجاع قيد)</button>
+                <button class="btnx btnx-yellow" onclick="askNote('${o._id}')">📝 ملاحظة</button>
+              `}
+            </div>
+          </div>`;
+        }).join('') + `</div>`;
+      }
+      $('#ordersWrap').innerHTML = html;
+
+      // بعد رسم البطاقات فعل استماع النقر على أرقام الزبائن
+      document.querySelectorAll('.cust-phone[data-phone]').forEach(el=>{
+        el.onclick = ()=>{
+          const phone = (el.dataset.phone||'').trim(); if(!phone) return;
+          const intl = `964${phone.replace(/^0/,'')}`;
+          Swal.fire({
+            title:`خيارات الهاتف: ${phone}`,
+            html: `
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px">
+                <a href="tel:${phone}" class="btnx btnx-green" style="text-decoration:none">📞 اتصال</a>
+                <a href="sms:${phone}" class="btnx btnx-yellow" style="text-decoration:none">✉️ SMS</a>
+                <a href="https://wa.me/${intl}" target="_blank" class="btnx" style="background:#25d366;color:#fff;text-decoration:none">💬 واتساب</a>
+                <button id="copyPhone" class="btnx btnx-red">📋 نسخ</button>
+              </div>`,
+            showConfirmButton:false, showCloseButton:true
+          });
+          setTimeout(()=>{
+            const cp = document.getElementById('copyPhone');
+            if(cp){ cp.onclick = ()=>{ navigator.clipboard.writeText(phone); Swal.fire('تم','تم نسخ الرقم','success'); }; }
+          }, 50);
+        };
+      });
+    }
+
+    $('#orderTabs').querySelectorAll('.tab').forEach(t=>{
+      t.onclick = ()=>{ $('#orderTabs').querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); draw(t.dataset.k); };
+    });
+    draw(document.querySelector('#orderTabs .tab.active').dataset.k);
+  });
+
+  // ======== زر المحاسبة كصورة (JPG) ========
+  $('#btnAccountingImg').onclick = async ()=>{
+    const ses=getSession(); const accountant = ses?.name || ses?.user || 'مدير';
+    const q = query(collection(db,'orders'), where('mandoubId','==',mandoubId), where('status','==','delivered'));
+    const s = await getDocs(q);
+
+    const rows = []; let total=0;
+    let i=1;
+    s.forEach(d=>{
+      const o=d.data();
+      rows.push({
+        idx:i++,
+        wasl:(o.wasl||''),
+        company:(o.company||''),
+        gov:(o.gov||''),
+        area:(o.area||''),
+        amount:Number(o.amount||0)
+      });
+      total += Number(o.amount||0);
+    });
+    const fees = (rows.length)*1000;
+    const net  = total - fees;
+
+    // تعبئة التقرير المخفي
+    $('#bxTotal').textContent = 'المبلغ الكلي: ' + fmtN(total);
+    $('#bxFees').textContent  = 'الأجور: ' + fmtN(fees);
+    $('#bxNet').textContent   = 'الصافي: ' + fmtN(net);
+    $('#bxOp').textContent    = 'رقم العملية: ' + randOp();
+    $('#bxDate').textContent  = 'التاريخ: ' + todayISO();
+    $('#bxCount').textContent = 'عدد الطلبات: ' + rows.length;
+
+    const body = $('#accBody'); body.innerHTML='';
+    if(rows.length===0){
+      const tr=document.createElement('tr');
+      tr.innerHTML = `<td colspan="7">لا توجد طلبات واصل — تقرير هيكلي</td>`;
+      body.appendChild(tr);
+    }else{
+      rows.forEach(r=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.idx}</td>
+          <td>${r.wasl}</td>
+          <td>${r.company}</td>
+          <td>${r.gov}</td>
+          <td>${r.area}</td>
+          <td>${fmtN(r.amount)}</td>
+          <td>${fmtN(r.amount - 1000)}</td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+    $('#accFooter').textContent = `اسم المندوب: ${mandoubName} — اسم المحاسب: ${accountant}`;
+
+    // تحويل إلى صورة وفتح تبويب جديد
+    const node = document.querySelector('#accReport');
+    const canvas = await html2canvas(node, { scale: 2, backgroundColor:'#fff' });
+    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+    const win = window.open('');
+    win.document.write('<title>تقرير محاسبة — صورة</title>');
+    win.document.write('<img src="'+imgData+'" style="width:100%;max-width:1000px;display:block;margin:auto;">');
+    win.document.close();
+    Swal.fire('تم','تم إنشاء تقرير المحاسبة (صورة)','success');
+  };
+
+  // ترحيل إلى الأرشيف (شرط: عامل محاسبة)
+  $('#btnArchive').onclick = async ()=>{
+    const md = await getDoc(mRef);
+    const lastAcc = md.data()?.lastAccountingAt;
+    if(!lastAcc){ return Swal.fire('تنبيه','لا يمكن الترحيل قبل إجراء المحاسبة للمندوب','warning'); }
+    const conf = await Swal.fire({title:'ترحيل البيانات',text:'سيتم ترحيل الواصل (حذف من القائمة) ونسخ الرفض إلى الأرشيف. متابعة؟',icon:'warning',showCancelButton:true,confirmButtonText:'ترحيل'});
+    if(!conf.isConfirmed) return;
+
+    // delivered → archive (ونحذفهم من orders)
+    const qDel = query(collection(db,'orders'), where('mandoubId','==',mandoubId), where('status','==','delivered'));
+    const sDel = await getDocs(qDel);
+    for (const d of sDel.docs){
+      const o=d.data();
+      await addDoc(collection(db,'archive'),{
+        ...o, archivedAt:serverTimestamp(), archivedBy:(getSession()?.name||getSession()?.user||'مدير'),
+        mandoubId, mandoubName, archiveSource:'delivered', lastStatus:'delivered'
+      });
+      await deleteDoc(doc(db,'orders', d.id));
+    }
+    // rejected → archive (نسخ فقط)
+    const qRej = query(collection(db,'orders'), where('mandoubId','==',mandoubId), where('status','==','rejected'));
+    const sRej = await getDocs(qRej);
+    for (const d of sRej.docs){
+      const o=d.data();
+      await addDoc(collection(db,'archive'),{
+        ...o, archivedAt:serverTimestamp(), archivedBy:(getSession()?.name||getSession()?.user||'مدير'),
+        mandoubId, mandoubName, archiveSource:'rejected', lastStatus:'rejected'
+      });
+    }
+
+    // إشعارين
+    await addDoc(collection(db,'notifications'),{
+      to: mandoubId, roleTarget:'mandoub', title:'ترحيل البيانات', message:`تم ترحيل بياناتك إلى الأرشيف بعد المحاسبة`, at:serverTimestamp(), seen:false
+    });
+    await addDoc(collection(db,'notifications'),{
+      to: 'managers', roleTarget:'manager', title:'ترحيل مكتمل', message:`تم ترحيل ${mandoubName}`, at:serverTimestamp(), seen:false
+    });
+
+    Swal.fire('تم','اكتملت عملية الترحيل','success');
+  };
+
+  // تصفير الملخص (يسجل وقت التصفير فقط)
+  $('#btnReset').onclick = async ()=>{
+    const r = await Swal.fire({title:'تصفير الملخص المالي',text:'تأكيد تصفير عدادات الملخص لهذا المندوب؟',icon:'question',showCancelButton:true,confirmButtonText:'تصفير'});
+    if(!r.isConfirmed) return;
+    await updateDoc(mRef, { lastResetAt: serverTimestamp() });
+    Swal.fire('تم','تم تصفير الملخص المالي','success');
+  };
+}
+
+/* ========== البحث ========== */
+async function renderSearch(){
+  content.innerHTML = `
+    <div class="card">
+      <h3>البحث</h3>
+      <div class="search-bar">
+        <input id="q" class="inp" style="height:56px;font-size:18px" placeholder="اكتب رقم وصل / هاتف / شركة / اسم مندوب">
+        <button class="btn" id="go" style="max-width:160px">بحث</button>
+      </div>
+      <div id="results" style="margin-top:10px"></div>
+    </div>
+  `;
+  $('#go').onclick = async ()=>{
+    const key=$('#q').value.trim(); if(!key) return;
+    const all=[];
+    const oSnap=await getDocs(collection(db,'orders'));
+    const aSnap=await getDocs(collection(db,'archive'));
+    oSnap.forEach(d=>all.push({...d.data(), _id:d.id, _where:'current'}));
+    aSnap.forEach(d=>all.push({...d.data(), _id:d.id, _where:'archive'}));
+    const k=key.toLowerCase();
+    const res=all.filter(o=>
+      String(o.wasl||'').includes(key) || String(o.phone||'').includes(key) ||
+      String(o.company||'').toLowerCase().includes(k) || String(o.mandoubName||'').toLowerCase().includes(k)
+    );
+    if(!res.length) return $('#results').innerHTML=`<div class="card">لا توجد نتائج</div>`;
+    let html = `<div class="orders">`+res.map(o=>{
+      const color=o._where==='archive'?'arch-card':(o.status==='pending'?'pending':o.status==='temp'?'temp':o.status==='delayed'?'delayed':o.status==='delivered'?'delivered':'rejected');
+      return `<div class="order-card ${color}">
+        <p>📦 <b>${o.wasl||'-'}</b> — ${o._where==='archive'?'أرشيف':'حالي'}</p>
+        <p>👤 المندوب: ${o.mandoubName||'-'} — الشركة: ${o.company||'-'}</p>
+        <p>💵 ${fmtN(o.amount)} — الحالة: <b>${o._where==='archive'? (o.lastStatus||'-') : statusText(o.status)}</b></p>
+      </div>`;
+    }).join('')+`</div>`;
+    $('#results').innerHTML=html;
+  };
+}
+
+/* ========== الأرشيف (رمادي وغير قابل للتعديل) ========== */
+async function renderArchive(){
+  const aSnap = await getDocs(collection(db,'archive'));
+  if(aSnap.empty){ content.innerHTML = `<div class="card">الأرشيف فارغ</div>`; return; }
+  let html = `<div class="orders">`;
+  aSnap.forEach(d=>{
+    const o=d.data(); const dt=o.archivedAt?.toDate?.();
+    html += `<div class="order-card arch-card">
+      <p>📦 <b>الوصل:</b> ${o.wasl||'-'} • <b>الشركة:</b> ${o.company||'-'}</p>
+      <p>👤 المندوب: ${o.mandoubName||'-'} • 📱 ${o.phone||'-'}</p>
+      <p>🏙️ ${o.gov||'-'} — ${o.area||'-'} • 💵 ${fmtN(o.amount||0)}</p>
+      <p>الحالة عند الأرشفة: <b>${o.lastStatus||'-'}</b> • آخر عملية: ${o.managerNote||o.reason||'-'}</p>
+      <small>أُرشف بواسطة: ${o.archivedBy||'-'} • ${dt?dt.toLocaleDateString()+' '+apm(dt):''}</small>
+    </div>`;
+  });
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
+/* ========== إضافة مندوب ========== */
+async function renderAddMandoub(){
+  content.innerHTML = `
+    <div class="card">
+      <h3>إضافة مندوب جديد</h3>
+      <input id="mName" class="inp" placeholder="اسم المندوب">
+      <input id="mPhone" class="inp" placeholder="رقم الهاتف">
+      <input id="mUser" class="inp" placeholder="اسم المستخدم (للتسجيل)">
+      <input id="mPass" class="inp" placeholder="كلمة المرور (للتسجيل)">
+      <button class="btn" id="saveM">حفظ</button>
+    </div>
+  `;
+  $('#saveM').onclick = async ()=>{
+    const name=$('#mName').value.trim(), phone=$('#mPhone').value.trim(),
+          user=$('#mUser').value.trim().toLowerCase(), password=$('#mPass').value.trim();
+    if(!name||!phone||!user||!password) return Swal.fire('تنبيه','أدخل كل الحقول','warning');
+    await addDoc(collection(db,'mandoubs'),{name, phone, user, password, status:'active'});
+    await addDoc(collection(db,'users'),{user,password,name,role:'مندوب',status:'active'});
+    Swal.fire('تم','أُضيف المندوب وتم إنشاء حساب الدخول','success');
+    renderMandoubs();
+  };
+}
+
+/* ========== إضافة طلب ========== */
+async function renderAddOrder(){
+  const ms=await getDocs(collection(db,'mandoubs'));
+  let opts=''; ms.forEach(d=>{const m=d.data(); opts+=`<option value="${d.id}" data-name="${m.name}">${m.name}</option>`})
+  content.innerHTML = `
+    <div class="card">
+      <h3>إضافة طلب</h3>
+      <select id="oM" class="inp">${opts}</select>
+      <input id="oWasl" class="inp" placeholder="رقم الوصل">
+      <input id="oAmount" type="number" class="inp" placeholder="المبلغ">
+      <input id="oGov" class="inp" placeholder="المحافظة">
+      <input id="oArea" class="inp" placeholder="المنطقة">
+      <input id="oPhone" class="inp" placeholder="هاتف الزبون">
+      <input id="oCompany" class="inp" placeholder="الشركة">
+      <textarea id="oNotes" class="inp" placeholder="ملاحظات (اختياري)"></textarea>
+      <button class="btn" id="saveO">إضافة</button>
+    </div>
+  `;
+  $('#saveO').onclick = async ()=>{
+    const ses=getSession(); if(!ses) return;
+    const wasl=$('#oWasl').value.trim(), amount=Number($('#oAmount').value||0),
+      mandoubId=$('#oM').value, mandoubName=$('#oM').selectedOptions[0].dataset.name,
+      gov=$('#oGov').value.trim(), area=$('#oArea').value.trim(),
+      phone=$('#oPhone').value.trim(), company=$('#oCompany').value.trim(), notes=$('#oNotes').value.trim();
+    if(!wasl||!amount||!mandoubId||!gov||!area||!phone||!company) return Swal.fire('تنبيه','أدخل كل الحقول','warning');
+
+    const ref = await addDoc(collection(db,'orders'),{
+      wasl, amount, mandoubId, mandoubName, gov, area, phone, company, notes:notes||'',
+      status:'pending', createdAt: serverTimestamp(), lastUpdate: serverTimestamp()
+    });
+    await addDoc(collection(db,'notifications'),{
+      to: mandoubId, roleTarget:'mandoub', type:'new_order', title:'طلب جديد',
+      message:`تمت إضافة طلب #${wasl}`, orderId: ref.id, by:(ses.name||ses.user), at:serverTimestamp(), seen:false
+    });
+    await addDoc(collection(db,'notifications'),{
+      to: 'managers', roleTarget:'manager', type:'new_order_copy', title:'نسخة: طلب جديد',
+      message:`(نسخة) أُضيف طلب للمندوب ${mandoubName}`, orderId: ref.id, by:(ses.name||ses.user), at:serverTimestamp(), seen:false
+    });
+    Swal.fire('تم','أُضيف الطلب','success');
+    ['oWasl','oAmount','oGov','oArea','oPhone','oCompany','oNotes'].forEach(id=>$('#'+id).value='');
+  };
+}
+
+/* ========== الموظفون والمندوبون (مع صلاحيات عرض/أزرار) ========== */
+async function renderPeople(){
+  const ses = getSession();
+  if(!ses) return requireLogin();
+
+  // صلاحيات على الواجهة
+  const isExec = (ses.role === 'مدير تنفيذي' || /تنفيذي/i.test(ses.role||''));
+  const isTech = (ses.role === 'المدير الفني' || /فني/i.test(ses.role||''));
+  const isFollow = (ses.role === 'موظف المتابعة' || /متابعة/i.test(ses.role||''));
+
+  // جلب البيانات
+  const usSnap = await getDocs(collection(db,'users'));
+  const mSnap  = await getDocs(collection(db,'mandoubs'));
+
+  // بناء واجهة المستخدم اعتماداً على الصلاحيات
+  let html = '';
+
+  // ---------- المستخدمون (users) ----------
+  html += `<div class="card"><h3>المستخدمون</h3></div>`;
+  if(usSnap.empty){
+    html += `<div class="card">لا يوجد مستخدمون</div>`;
+  } else {
+    usSnap.forEach(d=>{
+      const u = d.data();
+      if(isExec){
+        html += `<div class="order-card" style="background:#fff;color:#111;border:1px solid var(--border);">
+          <p><b>${u.name||u.user}</b> — <small>${u.role||''}</small></p>
+          <p>📱 الهاتف: <b>${u.phone||'-'}</b></p>
+          <p>🔑 يوزر: <b>${u.user||'-'}</b> • كلمة المرور: <b>${u.password||'-'}</b></p>
+          <div style="margin-top:8px">
+            <button class="btnx btnx-red" data-act="del" data-type="users" data-id="${d.id}">🗑️ حذف الحساب</button>
+            ${u.status==='inactive'
+              ? `<button class="btnx btnx-green" data-act="activate" data-type="users" data-id="${d.id}">🟢 تفعيل</button>`
+              : `<button class="btnx btnx-yellow" data-act="deactivate" data-type="users" data-id="${d.id}">🔴 إيقاف مؤقت</button>`}
+            <button class="btnx btnx-gray" data-act="resetpw" data-type="users" data-id="${d.id}">🔐 إعادة تعيين كلمة المرور</button>
+          </div>
+        </div>`;
+      } else if(isTech || isFollow){
+        html += `<div class="order-card" style="background:#fff;color:#111;border:1px solid var(--border);">
+          <p><b>${u.name||u.user}</b></p>
+        </div>`;
+      }
+    });
+  }
+
+  // ---------- المندوبون (mandoubs) ----------
+  html += `<div style="height:8px"></div><div class="card"><h3>المندوبون</h3></div>`;
+  if(mSnap.empty){
+    html += `<div class="card">لا يوجد مندوبون</div>`;
+  } else {
+    mSnap.forEach(d=>{
+      const m = d.data();
+      if(isExec){
+        html += `<div class="order-card" style="background:#fff;color:#111;border:1px solid var(--border);">
+          <p><b>🏍️ ${m.name}</b> ${m.status==='inactive' ? '(موقوف)':''}</p>
+          <p>📱 الهاتف: <b>${m.phone||'-'}</b></p>
+          <p>🔑 يوزر: <b>${m.user||'-'}</b> • كلمة المرور: <b>${m.password||'-'}</b></p>
+          <div style="margin-top:8px">
+            <button class="btnx btnx-red" data-act="del" data-type="mandoubs" data-id="${d.id}">🗑️ حذف الحساب</button>
+            ${m.status==='inactive'
+              ? `<button class="btnx btnx-green" data-act="activate" data-type="mandoubs" data-id="${d.id}">🟢 تفعيل</button>`
+              : `<button class="btnx btnx-yellow" data-act="deactivate" data-type="mandoubs" data-id="${d.id}">🔴 إيقاف مؤقت</button>`}
+            <button class="btnx btnx-gray" data-act="resetpw" data-type="mandoubs" data-id="${d.id}">🔐 إعادة تعيين كلمة المرور</button>
+          </div>
+        </div>`;
+      } else if(isTech || isFollow){
+        html += `<div class="order-card" style="background:#fff;color:#111;border:1px solid var(--border);">
+          <p><b>🏍️ ${m.name}</b></p>
+        </div>`;
+      }
+    });
+  }
+
+  // أدخل المحتوى
+  content.innerHTML = html;
+
+  // اربط أزرار الإدارة (حذف/ايقاف/تفعيل/إعادة تعيين)
+  content.querySelectorAll('[data-act]').forEach(btn=>{
+    btn.onclick = async ()=>{
+      const act  = btn.dataset.act;       // del / deactivate / activate / resetpw
+      const type = btn.dataset.type;      // "users" أو "mandoubs"
+      const id   = btn.dataset.id;
+
+      const ses = getSession();
+      const isExecNow = (ses?.role === 'مدير تنفيذي' || /تنفيذي/i.test(ses?.role||''));
+      if(!isExecNow){ return Swal.fire('ممنوع','ليس لديك صلاحية تنفيذ هذه العملية','error'); }
+
+      if(act==='del'){
+        const r = await Swal.fire({title:'حذف نهائي؟',text:'سيتم حذف الحساب بشكل دائم',icon:'warning',showCancelButton:true,confirmButtonText:'حذف'});
+        if(!r.isConfirmed) return;
+        await deleteDoc(doc(db, type, id));
+        Swal.fire('تم','حُذف الحساب نهائيًا','success');
+        return renderPeople();
+      }
+
+      if(act==='deactivate'){
+        await updateDoc(doc(db, type, id), { status:'inactive' });
+        // إشعار للمستخدم
+        await addDoc(collection(db,'notifications'),{
+          to: id, roleTarget: (type==='mandoubs'?'mandoub':'user'),
+          title:'إيقاف مؤقت', message:'تم إيقاف حسابك مؤقتًا من قبل الإدارة التنفيذية.',
+          at: serverTimestamp(), seen:false
+        });
+        Swal.fire('تم','تم إيقاف الحساب مؤقتًا','success');
+        return renderPeople();
+      }
+
+      if(act==='activate'){
+        await updateDoc(doc(db, type, id), { status:'active' });
+        await addDoc(collection(db,'notifications'),{
+          to: id, roleTarget: (type==='mandoubs'?'mandoub':'user'),
+          title:'تفعيل الحساب', message:'تم تفعيل حسابك ويمكنك تسجيل الدخول الآن.',
+          at: serverTimestamp(), seen:false
+        });
+        Swal.fire('تم','تم تفعيل الحساب','success');
+        return renderPeople();
+      }
+
+      if(act==='resetpw'){
+        const { value: newpw } = await Swal.fire({
+          title: 'إعادة تعيين كلمة المرور',
+          input: 'text',
+          inputLabel: 'أدخل كلمة مرور مؤقتة للمستخدم (سيُطلب منه تغييرها لاحقًا)',
+          inputPlaceholder: 'كلمة مرور مؤقتة',
+          showCancelButton:true
+        });
+        if(!newpw) return;
+        await updateDoc(doc(db,type,id), { password: newpw, mustChangePassword: true });
+        await addDoc(collection(db,'notifications'),{
+          to: id, roleTarget: (type==='mandoubs'?'mandoub':'user'),
+          title:'تعيين كلمة مرور مؤقتة', message:'تم تعيين كلمة مرور مؤقتة لحسابك. الرجاء تغييرها عند أول تسجيل دخول.',
+          at: serverTimestamp(), seen:false
+        });
+        Swal.fire('تم','تم تعيين كلمة مرور مؤقتة','success');
+        return renderPeople();
+      }
+    };
+  });
+}
+
+/* ========== الإشعارات ========== */
+let unsubNotifs=null;
+function renderNotifications(){
+  content.innerHTML = `<div class="card"><h3>الإشعارات</h3><div id="notifList"></div></div>`;
+  if(unsubNotifs) unsubNotifs();
+  unsubNotifs = onSnapshot(query(collection(db,'notifications'), orderBy('at','desc')), (snap)=>{
+    let html='';
+    snap.docChanges().forEach(ch=>{ if(ch.type==='added'){ try{beep.currentTime=0; beep.play();}catch{} }});
+    snap.forEach(d=>{
+      const n=d.data(); const dd=n.at?.toDate ? n.at.toDate() : null;
+      const when = dd? `${dd.getDate()}/${dd.getMonth()+1}/${dd.getFullYear()} • ${apm(dd)}` : '-';
+      html += `<div class="card" style="border-color:#ffd8b6">
+        <b>🔔 ${n.title||'تنبيه'}</b><br>${n.message||''}<br>
+        <small>${n.by||'-'} • ${when}</small>
+      </div>`;
+    });
+    $('#notifList').innerHTML = html || 'لا إشعارات';
+  });
+}
+
+/* ========== عمليات الطلب المشتركة ========== */
+window.setDelivered = async (id)=>{
+  const ses=getSession();
+  await updateDoc(doc(db,'orders',id), {status:'delivered', deliveredAt:serverTimestamp(), lastUpdate:serverTimestamp()});
+  await addDoc(collection(db,'notifications'),{type:'order_update',title:'تم التحديث: واصل',message:`طلب #${id} أصبح واصل`,orderId:id,roleTarget:'mandoub+manager',by:(ses?.name||ses?.user||'مدير'),at:serverTimestamp(),seen:false});
+  Swal.fire('تم','نُقلت إلى واصل','success');
+};
+window.delayDirect = async (id)=>{
+  await updateDoc(doc(db,'orders',id), {status:'delayed', lastUpdate:serverTimestamp()});
+  Swal.fire('تم','أُضيف إلى المؤجل (بدون أسباب)','success');
+};
+window.askReject = async (id)=>{
+  const {value:reason} = await Swal.fire({
+    title:'سبب الرفض', input:'select',
+    inputOptions:{'لا يرد':'لا يرد','لايرد بعد الاتفاق':'لايرد بعد الاتفاق','مغلق':'مغلق','مغلق بعد الاتفاق':'مغلق بعد الاتفاق',
+      'رفض اختلاف الطلب':'رفض اختلاف الطلب','رفض اختلاف القياس':'رفض اختلاف القياس','رفض اختلاف اللون':'رفض اختلاف اللون',
+      'الغاء الطلب':'الغاء الطلب','تغير سعر':'تغير سعر'},
+    inputPlaceholder:'اختر سبب', showCancelButton:true
+  });
+  if(!reason) return;
+  let updates = {status:'temp', tempType:'reject', reason, lastUpdate:serverTimestamp()};
+  if(reason==='تغير سعر'){
+    const {value:newPrice} = await Swal.fire({title:'السعر الجديد', input:'number', inputAttributes:{min:0}, showCancelButton:true});
+    if(!newPrice) return;
+    const {isConfirmed:hasReturn} = await Swal.fire({title:'هل يوجد راجع؟', icon:'question', showCancelButton:true, confirmButtonText:'نعم', cancelButtonText:'لا'});
+    updates.newAmount=Number(newPrice); updates.managerNote = (hasReturn? 'تغيير سعر + يوجد راجع' : 'تغيير سعر');
+  }
+  const {value:note} = await Swal.fire({title:'ملاحظة إضافية (اختياري)', input:'text', showCancelButton:true});
+  if(note) updates.managerNote = (updates.managerNote? updates.managerNote+' — ' : '') + note;
+  await updateDoc(doc(db,'orders',id), updates);
+  Swal.fire('تم','أُرسل لمؤقت لاتخاذ القرار','success');
+};
+window.backToPending = async (id)=>{
+  await updateDoc(doc(db,'orders',id), {status:'pending', lastUpdate:serverTimestamp()});
+  Swal.fire('تم','أُعيد إلى قيد التنفيذ','success');
+};
+window.askNote = async (id)=>{
+  const {value:note} = await Swal.fire({title:'أدخل الملاحظة', input:'text', showCancelButton:true});
+  if(note){ await updateDoc(doc(db,'orders',id), {managerNote: note, lastUpdate:serverTimestamp()}); Swal.fire('تم','حُفظت الملاحظة','success'); }
+};
+window.askDelete = async (id)=>{
+  const r=await Swal.fire({title:'حذف الطلب؟', icon:'warning', showCancelButton:true, confirmButtonText:'حذف'});
+  if(r.isConfirmed){ await deleteDoc(doc(db,'orders',id)); Swal.fire('تم','حُذف الطلب','success'); }
+};
+window.approveTemp = async (id)=>{
+  const d = await getDoc(doc(db,'orders',id)); if(!d.exists()) return;
+  const o=d.data();
+  if(o.tempType==='reject'){ await updateDoc(doc(db,'orders',id), {status:'rejected', lastUpdate:serverTimestamp()}); }
+  if(o.tempType==='delayed'){ await updateDoc(doc(db,'orders',id), {status:'delayed', lastUpdate:serverTimestamp()}); }
+  Swal.fire('تم','تطبيق القرار','success');
+};
+
+/* ابدأ */
+requireLogin();
+</script>
+</body>
+</html>
