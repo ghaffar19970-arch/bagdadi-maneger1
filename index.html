@@ -231,6 +231,76 @@
   .search-bar input{flex:1}
   .arch-card{background:#f3f4f6;color:#111827;border:1px solid #d1d5db}
 
+  /* أنماط للنسخ والاتصال */
+  .wasl-copyable, .phone-clickable {
+    transition: all 0.2s ease;
+    position: relative;
+    cursor: pointer;
+  }
+  .wasl-copyable:hover, .phone-clickable:hover {
+    opacity: 0.85;
+    text-decoration: underline !important;
+  }
+  .wasl-copyable:active, .phone-clickable:active {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+  .wasl-copyable {
+    text-decoration: underline dashed;
+  }
+  .phone-clickable {
+    text-decoration: underline dotted;
+  }
+
+  /* أنماط حقل المبلغ مع السالب والموجب */
+  .amount-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .amount-input-container input {
+    flex: 1;
+    padding-right: 40px !important;
+  }
+  
+  .negative-checkbox {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: white;
+    padding: 2px 5px;
+    border-radius: 15px;
+    border: 1px solid #d1d5db;
+    font-size: 11px;
+    z-index: 2;
+  }
+  
+  .negative-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+  }
+  
+  .negative-checkbox label {
+    color: #dc2626;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .amount-negative {
+    color: #dc2626 !important;
+  }
+  
+  .amount-positive {
+    color: #10b981 !important;
+  }
+  
   /* تحسينات شاشة تقرير المحاسبة */
   #accReportWrapper {
     position: fixed;
@@ -1053,6 +1123,152 @@ async function showPage(p){
   if(p==='about') return renderAbout();
 }
 
+/* ========== وظائف النسخ والاتصال ========== */
+
+// نسخ النص إلى الحافظة
+async function copyToClipboard(text, message = 'تم النسخ') {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast.fire({
+      icon: 'success',
+      title: `📋 ${message}`,
+      timer: 800
+    });
+  } catch (err) {
+    // fallback للنسخ
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    toast.fire({
+      icon: 'success',
+      title: `📋 ${message}`,
+      timer: 800
+    });
+  }
+}
+
+// نسخ رقم الوصل
+window.copyWaslNumber = function(waslNumber) {
+  if (waslNumber) {
+    copyToClipboard(waslNumber, 'تم نسخ رقم الوصل');
+  } else {
+    toast.fire({
+      icon: 'error',
+      title: '❌ لا يوجد رقم وصل',
+      timer: 800
+    });
+  }
+};
+
+// فتح قائمة خيارات رقم الزبون
+window.showCustomerPhoneMenu = function(phoneNumber, event) {
+  if (!phoneNumber || phoneNumber === 'لا يوجد') {
+    toast.fire({
+      icon: 'error',
+      title: '❌ لا يوجد رقم هاتف',
+      timer: 800
+    });
+    return;
+  }
+
+  // تنظيف رقم الهاتف من أي رموز غير رقمية
+  const cleanPhone = phoneNumber.replace(/[^0-9+]/g, '');
+  
+  // إنشاء قائمة الخيارات
+  Swal.fire({
+    title: '📱 خيارات الاتصال',
+    html: `
+      <div style="text-align:center;margin-bottom:15px">
+        <span style="font-size:18px;font-weight:bold;color:#f97316">${phoneNumber}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr;gap:10px">
+        <button id="callBtn" class="swal2-confirm swal2-styled" 
+                style="background:#3b82f6;display:flex;align-items:center;justify-content:center;gap:8px;width:100%">
+          📞 اتصال مباشر
+        </button>
+        
+        <button id="whatsappBtn" class="swal2-confirm swal2-styled" 
+                style="background:#25D366;display:flex;align-items:center;justify-content:center;gap:8px;width:100%">
+          💬 مراسلة واتساب
+        </button>
+        
+        <button id="smsBtn" class="swal2-confirm swal2-styled" 
+                style="background:#8b5cf6;display:flex;align-items:center;justify-content:center;gap:8px;width:100%">
+          ✉️ رسالة SMS
+        </button>
+        
+        <button id="copyBtn" class="swal2-confirm swal2-styled" 
+                style="background:#10b981;display:flex;align-items:center;justify-content:center;gap:8px;width:100%">
+          📋 نسخ رقم الهاتف
+        </button>
+      </div>
+    `,
+    showConfirmButton: false,
+    showCancelButton: true,
+    cancelButtonText: 'إلغاء',
+    cancelButtonColor: '#6b7280',
+    didOpen: () => {
+      // إضافة مستمعي الأحداث للأزرار
+      document.getElementById('callBtn').onclick = () => {
+        window.location.href = `tel:${cleanPhone}`;
+        Swal.close();
+      };
+      
+      document.getElementById('whatsappBtn').onclick = () => {
+        window.open(`https://wa.me/${cleanPhone.replace('+', '')}`, '_blank');
+        Swal.close();
+      };
+      
+      document.getElementById('smsBtn').onclick = () => {
+        window.location.href = `sms:${cleanPhone}`;
+        Swal.close();
+      };
+      
+      document.getElementById('copyBtn').onclick = () => {
+        copyToClipboard(phoneNumber, 'تم نسخ رقم الهاتف');
+        Swal.close();
+      };
+    }
+  });
+};
+
+// إضافة دالة لتحويل جميع أرقام الوصل في الصفحة إلى عناصر قابلة للنسخ
+function makeWaslNumbersCopyable() {
+  document.querySelectorAll('.wasl-copyable').forEach(el => {
+    if (!el.hasAttribute('data-copy-initialized')) {
+      el.setAttribute('data-copy-initialized', 'true');
+      el.style.cursor = 'pointer';
+      el.title = 'اضغط لنسخ رقم الوصل';
+    }
+  });
+}
+
+// إضافة دالة لتحويل أرقام الزبائن إلى عناصر قابلة للنقر
+function makePhonesClickable() {
+  document.querySelectorAll('.phone-clickable').forEach(el => {
+    if (!el.hasAttribute('data-phone-initialized')) {
+      el.setAttribute('data-phone-initialized', 'true');
+      el.style.cursor = 'pointer';
+      el.title = 'اضغط لعرض خيارات الاتصال';
+    }
+  });
+}
+
+// مراقبة التغييرات في DOM لإضافة الخصائص للعناصر الجديدة
+const observer = new MutationObserver(function(mutations) {
+  makeWaslNumbersCopyable();
+  makePhonesClickable();
+});
+
+// بدء مراقبة التغييرات
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+
 /* ========== الرئيسية - عرض الإحصائيات لكل مندوب ========== */
 async function renderHome(){
   // جلب أجور التوصيل من الإعدادات أولاً
@@ -1252,23 +1468,6 @@ async function loadActiveAds() {
     if (container) {
       container.innerHTML = '<p style="color:#ef4444;text-align:center">تعذر تحميل الإعلانات</p>';
     }
-  }
-}
-
-/* ========== تحميل الإعلانات لواجهة المندوب ========== */
-async function loadActiveAdsToMandoubUI() {
-  try {
-    const cfgRef = doc(db, 'config', 'global');
-    const snap = await getDoc(cfgRef);
-    
-    if (!snap.exists()) return null;
-    
-    const config = snap.data();
-    const ads = Array.isArray(config.ads) ? config.ads : [];
-    return ads.filter(ad => ad && ad.status === 'active');
-  } catch (error) {
-    console.error('Error loading ads for mandoub:', error);
-    return [];
   }
 }
 
@@ -1531,15 +1730,33 @@ function displayAutoSearchResults(orders) {
       'rejected': '#ef4444'
     }[order.status] || '#64748b';
     
+    // تحديد لون المبلغ بناءً على إشارته
+    const amountColor = order.amount < 0 ? '#dc2626' : '#10b981';
+    const amountPrefix = order.amount < 0 ? '🔴' : '💰';
+    
     html += `
       <div class="order-card" style="background:${statusColor}">
         <div style="display:flex;justify-content:space-between;align-items:start">
           <div style="flex:1">
             <p style="font-weight:800;margin:0 0 5px">${order.company || 'غير معروف'}</p>
-            <p style="margin:0 0 3px;font-size:12px">📋 الوصل: ${order.wasl || 'لا يوجد'}</p>
+            <p style="margin:0 0 3px;font-size:12px">
+              📋 الوصل: 
+              <span class="wasl-copyable" onclick="copyWaslNumber('${order.wasl||''}')" style="color:#fff;text-decoration:underline;text-decoration-style:dashed">
+                ${order.wasl||'لا يوجد'}
+              </span>
+            </p>
             <p style="margin:0 0 3px;font-size:12px">📍 ${order.area || 'غير معروف'} - ${order.gov || 'الأنبار'}</p>
-            <p style="margin:0 0 3px;font-size:12px">📞 ${order.customerPhone || 'لا يوجد'}</p>
-            <p style="margin:0 0 3px;font-size:12px">💰 ${fmtN(Number(order.amount || 0))} د.ع</p>
+            <p style="margin:0 0 3px;font-size:12px">
+              📞 
+              <span class="phone-clickable" onclick="showCustomerPhoneMenu('${order.customerPhone||''}', event)" 
+                    style="color:#fff;text-decoration:underline;text-decoration-style:dotted">
+                ${order.customerPhone||'لا يوجد'}
+              </span>
+            </p>
+            <p style="margin:0 0 3px;font-size:12px">
+              <span style="color:${amountColor};font-weight:bold">${amountPrefix} ${fmtN(Number(order.amount || 0))} د.ع</span>
+              ${order.isNegative ? '<span style="background:#dc2626;color:white;padding:2px 5px;border-radius:4px;font-size:9px;margin-right:5px">سالب</span>' : ''}
+            </p>
             <p style="margin:0 0 3px;font-size:12px">🎭 ${statusText(order.status)}</p>
             <p style="margin:0 0 5px;font-size:11px;opacity:0.9">📅 ${createdAt}</p>
             ${order.notes_fragile || order.notes_urgent || order.notes_no_open ? `
@@ -1627,14 +1844,6 @@ window.clearSearch = function() {
       </p>
     </div>
   `;
-};
-
-/* ========== دعم للبحث القديم (للتوافق) ========== */
-window.performSearch = async function() {
-  const searchText = $('#searchInput').value.trim();
-  if (searchText) {
-    await performAutoSearch(searchText);
-  }
 };
 
 /* ========== صفحة الأرشيف ========== */
@@ -1732,14 +1941,20 @@ async function renderAddOrder(){
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px">
           <div>
             <label style="display:block;margin-bottom:5px;font-size:14px;color:#374151">💰 السعر (بالآلاف) *</label>
-            <input type="text" 
-                   inputmode="decimal"
-                   id="amount" 
-                   pattern="[0-9]+([\.,][0-9]{1,3})?" 
-                   required 
-                   style="width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;font-size:14px"
-                   placeholder="مثال: 51.500 أو 30.750">
-            <small style="color:#6b7280;font-size:12px">المبلغ بالآلاف (1 = 1000 دينار)</small>
+            <div class="amount-input-container">
+              <input type="text" 
+                     inputmode="decimal"
+                     id="amount" 
+                     pattern="[0-9]+([\.,][0-9]{1,3})?" 
+                     required 
+                     style="width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db;font-size:14px"
+                     placeholder="مثال: 51.500 أو 30.750">
+              <div class="negative-checkbox">
+                <input type="checkbox" id="amountNegative">
+                <label for="amountNegative">سالب</label>
+              </div>
+            </div>
+            <small style="color:#6b7280;font-size:12px">المبلغ بالآلاف (1 = 1000 دينار) - اختر "سالب" للمبالغ المستردة</small>
           </div>
           
           <div>
@@ -1800,10 +2015,27 @@ async function renderAddOrder(){
   content.innerHTML=html;
   
   $('#amount').oninput=function(){
-    const amountStr = this.value.trim().replace(',', '.');
-    const amount = parseFloat(amountStr) || 0;
-    $('#amountDinar').value = fmtN(amount * AMOUNT_UNIT) + ' دينار';
+    updateAmountDisplay();
   };
+  
+  $('#amountNegative').onchange=function(){
+    updateAmountDisplay();
+  };
+  
+  function updateAmountDisplay() {
+    const amountStr = $('#amount').value.trim().replace(',', '.');
+    let amount = parseFloat(amountStr) || 0;
+    const isNegative = $('#amountNegative').checked;
+    
+    if (isNegative) {
+      amount = -Math.abs(amount);
+    }
+    
+    const amountInDinar = amount * AMOUNT_UNIT;
+    const displayClass = isNegative ? 'amount-negative' : 'amount-positive';
+    $('#amountDinar').value = fmtN(Math.abs(amountInDinar)) + ' دينار';
+    $('#amountDinar').className = isNegative ? 'amount-negative' : 'amount-positive';
+  }
   
   $('#mandoubId').onchange=function(){
     const selectedOption=this.options[this.selectedIndex];
@@ -2172,6 +2404,7 @@ async function submitNewOrder(){
   const notes_fragile=$('#notes_fragile').checked;
   const notes_urgent=$('#notes_urgent').checked;
   const notes_no_open=$('#notes_no_open').checked;
+  const isNegative=$('#amountNegative').checked;
   
   if(!wasl){
     toast.fire({icon:'error',title:'أدخل رقم الوصل'});
@@ -2186,10 +2419,15 @@ async function submitNewOrder(){
     return;
   }
   
-  const amountNum = parseFloat(amountStr);
+  let amountNum = parseFloat(amountStr);
   if(isNaN(amountNum) || amountNum <= 0){
     toast.fire({icon:'error',title:'أدخل سعراً صحيحاً أكبر من صفر'});
     return;
+  }
+  
+  // تطبيق الإشارة السالبة إذا تم اختيارها
+  if (isNegative) {
+    amountNum = -Math.abs(amountNum);
   }
   
   if(!customerPhone){
@@ -2220,7 +2458,8 @@ async function submitNewOrder(){
       status:'pending',
       createdBy: ses.name || ses.user,
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
+      isNegative: isNegative
     };
     
     await addDoc(collection(db,'orders'),orderData);
@@ -2233,7 +2472,7 @@ async function submitNewOrder(){
         mandoubId,
         mandoubName:mandoubData.name,
         title:'طلب جديد',
-        body:`طلب جديد من ${company} بقيمة ${fmtN(amountInDinar)} دينار`,
+        body:`طلب جديد من ${company} بقيمة ${fmtN(Math.abs(amountInDinar))} دينار ${isNegative ? '(سالب)' : ''}`,
         type:'new_order',
         orderWasl:wasl,
         sentBy:ses.name||'المدير',
@@ -2359,14 +2598,32 @@ function displayArchiveResults(docs){
     const bgColor=isArchived?'#f3f4f6':'#ffffff';
     const textColor=isArchived?'#6b7280':'#111827';
     
+    // تحديد لون المبلغ بناءً على إشارته
+    const amountColor = order.amount < 0 ? '#dc2626' : '#10b981';
+    const amountPrefix = order.amount < 0 ? '🔴' : '💰';
+    
     html+=`
       <div class="order-card arch-card" style="background:${bgColor};color:${textColor}">
         <div style="flex:1">
           <p style="font-weight:800;margin:0 0 5px">${order.company||'غير معروف'}</p>
-          <p style="margin:0 0 3px;font-size:12px">📋 الوصل: ${order.wasl||'لا يوجد'}</p>
+          <p style="margin:0 0 3px;font-size:12px">
+            📋 الوصل: 
+            <span class="wasl-copyable" onclick="copyWaslNumber('${order.wasl||''}')" style="color:${textColor};text-decoration:underline;text-decoration-style:dashed">
+              ${order.wasl||'لا يوجد'}
+            </span>
+          </p>
           <p style="margin:0 0 3px;font-size:12px">📍 ${order.area||'غير معروف'} - ${order.gov||'الأنبار'}</p>
-          <p style="margin:0 0 3px;font-size:12px">📞 ${order.customerPhone||'لا يوجد'}</p>
-          <p style="margin:0 0 3px;font-size:12px">💰 ${fmtN(Number(order.amount||0))} د.ع</p>
+          <p style="margin:0 0 3px;font-size:12px">
+            📞 
+            <span class="phone-clickable" onclick="showCustomerPhoneMenu('${order.customerPhone||''}', event)" 
+                  style="color:${textColor};text-decoration:underline;text-decoration-style:dotted">
+              ${order.customerPhone||'لا يوجد'}
+            </span>
+          </p>
+          <p style="margin:0 0 3px;font-size:12px">
+            <span style="color:${amountColor};font-weight:bold">${amountPrefix} ${fmtN(Math.abs(Number(order.amount||0)))} د.ع</span>
+            ${order.isNegative ? '<span style="background:#dc2626;color:white;padding:2px 5px;border-radius:4px;font-size:9px;margin-right:5px">سالب</span>' : ''}
+          </p>
           <p style="margin:0 0 3px;font-size:12px">🎭 ${statusText(order.status)}</p>
           <p style="margin:0 0 5px;font-size:11px">📅 ${createdAt}</p>
           ${order.notes_fragile||order.notes_urgent||order.notes_no_open?`
@@ -2573,7 +2830,7 @@ async function handlePriceChange(orderId,order){
   const {value:newPrice}=await Swal.fire({
     title:'السعر الجديد',
     input:'number',
-    inputLabel:`السعر الحالي: ${fmtN(order.amount)} دينار`,
+    inputLabel:`السعر الحالي: ${fmtN(Math.abs(order.amount))} دينار ${order.amount < 0 ? '(سالب)' : ''}`,
     inputPlaceholder:'أدخل السعر الجديد بالدينار',
     showCancelButton:true,
     confirmButtonText:'التالي',
@@ -2584,6 +2841,19 @@ async function handlePriceChange(orderId,order){
     toast.fire({icon:'error',title:'أدخل سعراً صحيحاً'});
     return;
   }
+  
+  const {value:isNegative}=await Swal.fire({
+    title:'نوع المبلغ',
+    input:'radio',
+    inputOptions:{
+      positive:'موجب',
+      negative:'سالب'
+    },
+    inputValue:'positive',
+    showCancelButton:true,
+    confirmButtonText:'تأكيد',
+    cancelButtonText:'إلغاء'
+  });
   
   const {value:hasReturn}=await Swal.fire({
     title:'هل يوجد راجع؟',
@@ -2600,29 +2870,35 @@ async function handlePriceChange(orderId,order){
   
   if(hasReturn){
     const ses=getSession();
-    const newAmount=Number(newPrice);
+    let newAmount=Number(newPrice);
+    if (isNegative === 'negative') {
+      newAmount = -newAmount;
+    }
+    
     const oldAmount=Number(order.amount);
-    const difference=Math.abs(newAmount-oldAmount);
+    const difference=Math.abs(newAmount - oldAmount);
     
     if(hasReturn==='yes'){
       const deliveredOrder={
         ...order,
         amount:newAmount,
         status:'delivered',
-        note:`🔄 تغيير السعر من ${fmtN(oldAmount)} إلى ${fmtN(newAmount)} دينار مع وجود راجع | تم التغيير بواسطة ${ses.name||ses.user}`,
+        note:`🔄 تغيير السعر من ${fmtN(Math.abs(oldAmount))} إلى ${fmtN(Math.abs(newAmount))} دينار ${newAmount < 0 ? '(سالب)' : ''} مع وجود راجع | تم التغيير بواسطة ${ses.name||ses.user}`,
         createdAt:serverTimestamp(),
-        updatedAt:serverTimestamp()
+        updatedAt:serverTimestamp(),
+        isNegative: newAmount < 0
       };
       delete deliveredOrder.id;
       await addDoc(collection(db,'orders'),deliveredOrder);
       
       const rejectedOrder={
         ...order,
-        amount:difference,
+        amount:difference * (newAmount < 0 ? -1 : 1),
         status:'rejected',
-        note:`🔄 فرق السعر بعد التغيير: ${fmtN(difference)} دينار (من ${fmtN(oldAmount)} إلى ${fmtN(newAmount)}) مع وجود راجع | تم التغيير بواسطة ${ses.name||ses.user}`,
+        note:`🔄 فرق السعر بعد التغيير: ${fmtN(difference)} دينار (من ${fmtN(Math.abs(oldAmount))} إلى ${fmtN(Math.abs(newAmount))}) مع وجود راجع | تم التغيير بواسطة ${ses.name||ses.user}`,
         createdAt:serverTimestamp(),
-        updatedAt:serverTimestamp()
+        updatedAt:serverTimestamp(),
+        isNegative: newAmount < 0
       };
       delete rejectedOrder.id;
       await addDoc(collection(db,'orders'),rejectedOrder);
@@ -2634,8 +2910,9 @@ async function handlePriceChange(orderId,order){
       await updateDoc(doc(db,'orders',orderId),{
         amount:newAmount,
         status:'delivered',
-        note:`🔄 تغيير السعر من ${fmtN(oldAmount)} إلى ${fmtN(newAmount)} دينار بدون راجع | تم التغيير بواسطة ${ses.name||ses.user}`,
-        updatedAt:serverTimestamp()
+        note:`🔄 تغيير السعر من ${fmtN(Math.abs(oldAmount))} إلى ${fmtN(Math.abs(newAmount))} دينار ${newAmount < 0 ? '(سالب)' : ''} بدون راجع | تم التغيير بواسطة ${ses.name||ses.user}`,
+        updatedAt:serverTimestamp(),
+        isNegative: newAmount < 0
       });
       
       Swal.fire('تم','تم تغيير السعر بدون راجع','success');
@@ -2652,7 +2929,8 @@ window.editOrderFull=async function(orderId){
   if(!orderDoc.exists()) return;
   
   const order=orderDoc.data();
-  const amountInThousands=Number(order.amount||0)/AMOUNT_UNIT;
+  const amountInThousands = Math.abs(Number(order.amount||0)) / AMOUNT_UNIT;
+  const isNegative = order.amount < 0;
   
   const mandoubsSnap=await getDocs(collection(db,'mandoubs'));
   const mandoubsOptions=mandoubsSnap.docs.map(doc=>{
@@ -2667,7 +2945,13 @@ window.editOrderFull=async function(orderId){
       <input id="swal-wasl" class="swal2-input" placeholder="رقم الوصل" value="${order.wasl||''}">
       <input id="swal-company" class="swal2-input" placeholder="اسم الشركة" value="${order.company||''}">
       <input id="swal-customerPhone" class="swal2-input" placeholder="رقم هاتف الزبون" value="${order.customerPhone||''}">
-      <input id="swal-amount" class="swal2-input" placeholder="السعر (بالآلاف)" value="${amountInThousands}">
+      <div style="position:relative;margin:10px 0">
+        <input id="swal-amount" class="swal2-input" placeholder="السعر (بالآلاف)" value="${amountInThousands}" style="padding-right:70px">
+        <div style="position:absolute;left:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:5px;background:white;padding:2px 8px;border-radius:15px;border:1px solid #d1d5db">
+          <input type="checkbox" id="swal-amountNegative" ${isNegative ? 'checked' : ''}>
+          <label for="swal-amountNegative" style="color:#dc2626">سالب</label>
+        </div>
+      </div>
       <select id="swal-mandoubId" class="swal2-input" style="width:100%;padding:10px;border-radius:8px;border:1px solid #d1d5db">
         <option value="">اختر المندوب</option>
         ${mandoubsOptions}
@@ -2697,17 +2981,24 @@ window.editOrderFull=async function(orderId){
     confirmButtonText:'تحديث',
     cancelButtonText:'إلغاء',
     preConfirm:()=>{
+      let amount = Number(document.getElementById('swal-amount').value) * AMOUNT_UNIT;
+      const isNeg = document.getElementById('swal-amountNegative').checked;
+      if (isNeg) {
+        amount = -Math.abs(amount);
+      }
+      
       return{
         wasl:document.getElementById('swal-wasl').value,
         company:document.getElementById('swal-company').value,
         customerPhone:document.getElementById('swal-customerPhone').value,
-        amount:Number(document.getElementById('swal-amount').value)*AMOUNT_UNIT,
+        amount: amount,
         mandoubId:document.getElementById('swal-mandoubId').value,
         area:document.getElementById('swal-area').value,
         note:document.getElementById('swal-note').value,
         notes_fragile:document.getElementById('swal-notes_fragile').checked,
         notes_urgent:document.getElementById('swal-notes_urgent').checked,
-        notes_no_open:document.getElementById('swal-notes_no_open').checked
+        notes_no_open:document.getElementById('swal-notes_no_open').checked,
+        isNegative: isNeg
       };
     }
   });
@@ -2958,17 +3249,37 @@ window.viewOrderDetails=async function(orderId){
     if(order.notes_urgent) notes.push('🚨 مستعجل');
     if(order.notes_no_open) notes.push('⛔ عدم فتح');
     
+    const amountColor = order.amount < 0 ? '#dc2626' : '#10b981';
+    const amountPrefix = order.amount < 0 ? '🔴' : '💰';
+    
     Swal.fire({
       title:`تفاصيل الطلب: ${order.company}`,
       html:`
         <div style="text-align:right;font-size:14px">
           <table style="width:100%;border-collapse:collapse">
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📋 رقم الوصل:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.wasl||'لا يوجد'}</td></tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📋 رقم الوصل:</strong></td>
+            <td style="padding:8px;border-bottom:1px solid #e5e7eb">
+              <span onclick="copyWaslNumber('${order.wasl||''}')" style="cursor:pointer;color:#3b82f6;text-decoration:underline">
+                ${order.wasl||'لا يوجد'}
+              </span>
+              <span style="font-size:11px;color:#6b7280;margin-right:8px">(اضغط للنسخ)</span>
+            </td></tr>
             <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🏢 الشركة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.company}</td></tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📞 الهاتف:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.customerPhone}</td></tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📞 الهاتف:</strong></td>
+            <td style="padding:8px;border-bottom:1px solid #e5e7eb">
+              <span onclick="showCustomerPhoneMenu('${order.customerPhone||''}', event)" 
+                    style="cursor:pointer;color:#3b82f6;text-decoration:underline">
+                ${order.customerPhone}
+              </span>
+              <span style="font-size:11px;color:#6b7280;margin-right:8px">(اضغط للخيارات)</span>
+            </td></tr>
             <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📍 الموقع:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.area} - ${order.gov}</td></tr>
             <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🏍️ المندوب:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${mandoubName}</td></tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>💰 المبلغ:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${fmtN(order.amount)} دينار</td></tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>💰 المبلغ:</strong></td>
+            <td style="padding:8px;border-bottom:1px solid #e5e7eb">
+              <span style="color:${amountColor};font-weight:bold">${amountPrefix} ${fmtN(Math.abs(order.amount))} دينار</span>
+              ${order.isNegative ? '<span style="background:#dc2626;color:white;padding:2px 5px;border-radius:4px;font-size:11px;margin-right:5px">سالب</span>' : ''}
+            </td></tr>
             <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🎭 الحالة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${statusText(order.status)}</td></tr>
             ${notes.length>0?`<tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>⚠️ ملاحظات:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${notes.join('، ')}</td></tr>`:''}
             ${order.note?`<tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>💬 ملاحظة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.note}</td></tr>`:''}
@@ -3064,16 +3375,34 @@ window.filterMandoubOrders=async function(mandoubId,status){
       const hasSpecialNotes=order.notes_fragile||order.notes_urgent||order.notes_no_open;
       const cardClass=hasSpecialNotes?'order-card warning-card':'order-card';
       
+      // تحديد لون المبلغ بناءً على إشارته
+      const amountColor = order.amount < 0 ? '#dc2626' : '#10b981';
+      const amountPrefix = order.amount < 0 ? '🔴' : '💰';
+      
       html+=`
         <div class="${cardClass}" style="background:${statusColor}">
           ${hasSpecialNotes?'<div class="warning-badge">⚠️</div>':''}
           <div style="display:flex;justify-content:space-between;align-items:start">
             <div style="flex:1">
               <p style="font-weight:800;margin:0 0 5px">${order.company||'غير معروف'}</p>
-              <p style="margin:0 0 3px;font-size:12px">📋 الوصل: ${order.wasl||'لا يوجد'}</p>
+              <p style="margin:0 0 3px;font-size:12px">
+                📋 الوصل: 
+                <span class="wasl-copyable" onclick="copyWaslNumber('${order.wasl||''}')" style="color:#fff;text-decoration:underline;text-decoration-style:dashed">
+                  ${order.wasl||'لا يوجد'}
+                </span>
+              </p>
               <p style="margin:0 0 3px;font-size:12px">📍 ${order.area||'غير معروف'} - ${order.gov||'الأنبار'}</p>
-              <p style="margin:0 0 3px;font-size:12px">📞 ${order.customerPhone||'لا يوجد'}</p>
-              <p style="margin:0 0 3px;font-size:12px">💰 ${fmtN(Number(order.amount||0))} د.ع</p>
+              <p style="margin:0 0 3px;font-size:12px">
+                📞 
+                <span class="phone-clickable" onclick="showCustomerPhoneMenu('${order.customerPhone||''}', event)" 
+                      style="color:#fff;text-decoration:underline;text-decoration-style:dotted">
+                  ${order.customerPhone||'لا يوجد'}
+                </span>
+              </p>
+              <p style="margin:0 0 3px;font-size:12px">
+                <span style="color:${amountColor};font-weight:bold">${amountPrefix} ${fmtN(Math.abs(Number(order.amount||0)))} د.ع</span>
+                ${order.isNegative ? '<span style="background:#dc2626;color:white;padding:2px 5px;border-radius:4px;font-size:9px;margin-right:5px">سالب</span>' : ''}
+              </p>
               <p style="margin:0 0 3px;font-size:12px">🎭 ${statusText(order.status)}</p>
               <p style="margin:0 0 3px;font-size:11px;opacity:0.9">📅 أُضيف: ${createdAt}</p>
               <p style="margin:0 0 5px;font-size:11px;opacity:0.9">🔄 آخر تحديث: ${updatedAt}</p>
@@ -3218,17 +3547,23 @@ window.generateReport = async function(mandoubId) {
       netAmount += orderNetAmount;
       
       const waslNumber = order.wasl || `طلب-${counter}`;
+      const amountColor = orderAmount < 0 ? '#dc2626' : '#10b981';
+      const amountPrefix = orderAmount < 0 ? '🔴' : '';
       
       htmlRows += `
         <tr>
           <td>${counter}</td>
-          <td>${waslNumber}</td>
+          <td>
+            <span onclick="copyWaslNumber('${waslNumber}')" style="cursor:pointer;color:#3b82f6;text-decoration:underline">
+              ${waslNumber}
+            </span>
+          </td>
           <td>${order.company || 'غير محدد'}</td>
           <td>${order.gov || 'غير محدد'}</td>
           <td>${order.area || 'غير محدد'}</td>
-          <td>${fmtN(orderAmount)} د.ع</td>
+          <td style="color:${amountColor};font-weight:bold">${fmtN(Math.abs(orderAmount))} د.ع ${orderAmount < 0 ? '(سالب)' : ''}</td>
           <td style="color:#dc2626;font-weight:bold">-${fmtN(orderDeliveryFee)} د.ع</td>
-          <td style="color:#10b981;font-weight:bold">${fmtN(orderNetAmount)} د.ع</td>
+          <td style="color:${orderNetAmount < 0 ? '#dc2626' : '#10b981'};font-weight:bold">${fmtN(Math.abs(orderNetAmount))} د.ع ${orderNetAmount < 0 ? '(سالب)' : ''}</td>
         </tr>
       `;
       counter++;
@@ -3240,9 +3575,9 @@ window.generateReport = async function(mandoubId) {
     const ses = getSession();
     
     // تحديث الصناديق الإحصائية
-    $('#bxTotal').innerHTML = `المبلغ الكلي<br><span style="font-size:14px">${fmtN(totalAmount)} د.ع</span>`;
+    $('#bxTotal').innerHTML = `المبلغ الكلي<br><span style="font-size:14px">${fmtN(Math.abs(totalAmount))} د.ع ${totalAmount < 0 ? '(سالب)' : ''}</span>`;
     $('#bxFees').innerHTML = `أجور التوصيل<br><span style="font-size:14px">${fmtN(deliveryFees)} د.ع (${feesPercentage}%)</span>`;
-    $('#bxNet').innerHTML = `المبلغ الصافي<br><span style="font-size:14px;color:#10b981">${fmtN(netAmount)} د.ع</span>`;
+    $('#bxNet').innerHTML = `المبلغ الصافي<br><span style="font-size:14px;color:${netAmount < 0 ? '#dc2626' : '#10b981'}">${fmtN(Math.abs(netAmount))} د.ع ${netAmount < 0 ? '(سالب)' : ''}</span>`;
     $('#bxOp').innerHTML = `رقم العملية<br><span style="font-size:12px">${randOp()}</span>`;
     $('#bxDate').innerHTML = `التاريخ<br><span style="font-size:12px">${new Date().toLocaleDateString('ar-IQ')}</span>`;
     $('#bxCount').innerHTML = `عدد الطلبات<br><span style="font-size:14px">${totalOrders}</span>`;
@@ -4892,4 +5227,4 @@ async function init(){
 init();
 </script>
 </body>
-</html>
+  </html>
