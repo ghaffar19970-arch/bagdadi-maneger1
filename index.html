@@ -6,36 +6,33 @@
 <title>البغدادي — لوحة المدير</title>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<!-- ========== التعديل 1: إضافة مكتبات PDF ========== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800&display=swap');
   
-  /* ========== الألوان الجديدة الاحترافية ========== */
   :root{
-    --primary:#0f2b3d;      /* أزرق داكن رئيسي */
-    --primary-dark:#0a1a2b; /* أزرق أعمق */
-    --primary-light:#1a4a6f; /* أزرق فاتح */
-    --accent:#d4af37;       /* ذهبي للتفاصيل */
-    --accent-light:#f0d97a;  /* ذهبي فاتح */
-    --success:#0d9488;       /* فيروزي للنجاح */
-    --warning:#f59e0b;       /* برتقالي للتحذير */
-    --danger:#dc2626;        /* أحمر للخطأ */
-    --dark:#0f172a;          /* داكن جداً */
-    --gray:#334155;          /* رمادي متوسط */
-    --light:#f1f5f9;         /* فاتح للخلفيات */
-    --card:#ffffff;          /* أبيض للبطاقات */
-    --card-dark:#1e293b;     /* بطاقات داكنة */
-    --border:#e2e8f0;        /* حدود */
-    --text:#0f172a;          /* لون النص الرئيسي */
-    --text-muted:#64748b;    /* نص ثانوي */
+    --primary:#0f2b3d;
+    --primary-dark:#0a1a2b;
+    --primary-light:#1a4a6f;
+    --accent:#d4af37;
+    --accent-light:#f0d97a;
+    --success:#0d9488;
+    --warning:#f59e0b;
+    --danger:#dc2626;
+    --dark:#0f172a;
+    --gray:#334155;
+    --light:#f1f5f9;
+    --card:#ffffff;
+    --card-dark:#1e293b;
+    --border:#e2e8f0;
+    --text:#0f172a;
+    --text-muted:#64748b;
     --orange:#f97316; --orange-soft:#fbbf24; --orange-50:#fff7ed; --orange-600:#ea580c;
     --muted:#64748b; --green:#16a34a; --yellow:#f59e0b; --red:#dc2626;
     --violet:#8b5cf6; --blue:#3b82f6; --bg:#0b1020;
   }
   
-  /* تأثيرات احترافية جديدة */
   .glass-card {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -65,7 +62,6 @@
     filter: brightness(1.05);
   }
   
-  /* تحسين شريط التمرير */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -224,6 +220,116 @@
   .role-entry{background:#8b5cf6;color:white}
   .password-field{display:none;font-family:monospace;background:#f1f5f9;padding:2px 6px;border-radius:4px}
   @media(min-width:768px){.sidebar.open{width:300px}.orders{grid-template-columns:repeat(2,1fr)}}
+  
+  /* ========== ستايل التقرير المنظم ========== */
+  .report-header-organized {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #d4af37;
+  }
+  .stats-box-organized {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .stat-card-organized {
+    background: #0f2b3d;
+    border-radius: 12px;
+    padding: 10px 20px;
+    text-align: center;
+    min-width: 120px;
+  }
+  .stat-card-organized .label {
+    font-size: 12px;
+    color: #d4af37;
+    margin-bottom: 5px;
+  }
+  .stat-card-organized .value {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+  }
+  .center-section-organized {
+    text-align: center;
+  }
+  .logo-organized {
+    background: #d4af37;
+    color: #0f2b3d;
+    padding: 8px 20px;
+    border-radius: 40px;
+    font-weight: bold;
+    font-size: 18px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .info-boxes-organized {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .info-card-organized {
+    background: #e9ecef;
+    border-radius: 10px;
+    padding: 8px 15px;
+    text-align: center;
+    min-width: 85px;
+  }
+  .info-card-organized .label {
+    font-size: 11px;
+    color: #6c757d;
+  }
+  .info-card-organized .value {
+    font-size: 15px;
+    font-weight: bold;
+    color: #0f2b3d;
+  }
+  .data-table-organized {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+  .data-table-organized th {
+    background: #0f2b3d;
+    color: white;
+    padding: 10px 6px;
+    border: 1px solid #2c7da0;
+  }
+  .data-table-organized td {
+    border: 1px solid #dee2e6;
+    padding: 8px 6px;
+    text-align: center;
+  }
+  .data-table-organized tr:nth-child(even) {
+    background: #f8f9fa;
+  }
+  .report-footer-organized {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px solid #dee2e6;
+    font-weight: bold;
+  }
+  .action-buttons-pdf {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .btn-pdf {
+    background: #dc2626;
+    color: white;
+  }
+  .btn-share {
+    background: #25D366;
+    color: white;
+  }
 </style>
 </head>
 <body>
@@ -271,31 +377,57 @@
         <div style="font-weight:800;font-size:16px;color:#d4af37;text-align:center">البغدادي للتوصيل السريع<br><small style="font-size:12px;color:#6b7280">تقرير محاسبة المندوب</small></div>
       </div>
       <div style="display:flex;gap:8px">
-        <button id="accDownloadBtn" class="acc-btn" style="background:#3b82f6;color:white">⬇ تحميل</button>
-        <button id="accShareBtn" class="acc-btn" style="background:#25D366;color:white">📤 مشاركة</button>
+        <button id="accDownloadBtn" class="acc-btn" style="background:#3b82f6;color:white">⬇ تحميل PDF</button>
+        <button id="accShareBtn" class="acc-btn" style="background:#25D366;color:white">📤 مشاركة PDF</button>
       </div>
     </div>
     <div id="accReport">
-      <div class="top-boxes">
-        <div class="right-boxes">
-          <div class="box" id="bxTotal">المبلغ الكلي:<br><span style="font-size:14px">0 د.ع</span></div>
-          <div class="box" id="bxFees">أجور المندوب:<br><span style="font-size:14px">0 د.ع</span></div>
-          <div class="box" id="bxNet">المبلغ الصافي:<br><span style="font-size:14px">0 د.ع</span></div>
+      <!-- ========== التقرير المنظم (بدون تشويه) ========== -->
+      <div class="report-header-organized">
+        <div class="stats-box-organized">
+          <div class="stat-card-organized">
+            <div class="label">💰 المبلغ الكلي</div>
+            <div class="value" id="bxTotalOrganized">0 د.ع</div>
+          </div>
+          <div class="stat-card-organized">
+            <div class="label">🧑‍💼 أجور المندوب</div>
+            <div class="value" id="bxFeesOrganized">0 د.ع</div>
+          </div>
+          <div class="stat-card-organized">
+            <div class="label">📊 المبلغ الصافي</div>
+            <div class="value" id="bxNetOrganized">0 د.ع</div>
+          </div>
         </div>
-        <div class="center-box">
-          <img id="reportLogoImg" src="" alt="شعار" style="width:60px;height:60px;border-radius:12px;object-fit:cover;margin-bottom:8px">
-          <div id="reportMandoubName" style="font-weight:bold;font-size:14px;color:#0f2b3d">اسم المندوب: -</div>
+        <div class="center-section-organized">
+          <div class="logo-organized">🚚 البغدادي للتوصيل</div>
+          <div class="delegate-name" id="reportMandoubNameOrganized">اسم المندوب: -</div>
         </div>
-        <div class="left-boxes">
-          <div class="box" id="bxDate">التاريخ:<br><span style="font-size:12px">-</span></div>
-          <div class="box" id="bxCount">عدد الطلبات:<br><span style="font-size:14px">0</span></div>
-          <div class="box" id="bxOp">رقم الكشف:<br><span style="font-size:12px">-</span></div>
+        <div class="info-boxes-organized">
+          <div class="info-card-organized">
+            <div class="label">📅 التاريخ</div>
+            <div class="value" id="bxDateOrganized">-</div>
+          </div>
+          <div class="info-card-organized">
+            <div class="label">📦 عدد الطلبات</div>
+            <div class="value" id="bxCountOrganized">0</div>
+          </div>
+          <div class="info-card-organized">
+            <div class="label">🔢 رقم الكشف</div>
+            <div class="value" id="bxOpOrganized">-</div>
+          </div>
         </div>
       </div>
-      <table id="accTable"><thead><tr><th style="width:5%">ت</th><th style="width:12%">رقم الوصل</th><th style="width:12%">اسم الشركة</th><th style="width:10%">المحافظة</th><th style="width:12%">المنطقة</th><th style="width:12%">هاتف الزبون</th><th style="width:12%">المبلغ الكلي</th><th style="width:12%">أجر التوصيل</th><th style="width:12%">المبلغ الصافي</th><th style="width:10%">الحالة</th> </thead><tbody id="accBody"></tbody> </table>
-      <div id="accFooter" style="margin-top:15px;padding-top:10px;border-top:2px solid #d4af37;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px">
-        <div><strong>اسم المندوب:</strong> <span id="footerMandoubName">-</span></div>
-        <div><strong>اسم المحاسب:</strong> <span id="footerAccountantName">-</span></div>
+
+      <table class="data-table-organized" id="accTableOrganized">
+        <thead>
+          <tr><th>#</th><th>رقم الوصل</th><th>اسم الشركة</th><th>المحافظة</th><th>المنطقة</th><th>هاتف الزبون</th><th>المبلغ الكلي</th><th>أجر التوصيل</th><th>المبلغ الصافي</th><th>الحالة</th></tr>
+        </thead>
+        <tbody id="accBodyOrganized"></tbody>
+      </table>
+
+      <div class="report-footer-organized">
+        <div>👤 اسم المندوب: <span id="footerMandoubNameOrganized">-</span></div>
+        <div>📋 اسم المحاسب: <span id="footerAccountantNameOrganized">-</span></div>
       </div>
     </div>
   </div>
@@ -349,7 +481,6 @@ function makeWaslNumbersCopyable(){document.querySelectorAll('.wasl-copyable').f
 function makePhonesClickable(){document.querySelectorAll('.phone-clickable').forEach(el=>{if(!el.hasAttribute('data-phone-initialized')){el.setAttribute('data-phone-initialized','true');el.style.cursor='pointer';el.title='اضغط لعرض خيارات الاتصال';}});}
 const observer2=new MutationObserver(()=>{makeWaslNumbersCopyable();makePhonesClickable();});observer2.observe(document.body,{childList:true,subtree:true});
 
-// ========== دوال جديدة لإظهار كلمات المرور ==========
 window.togglePasswordVisibility = function(containerId, isMandoub = true) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -376,7 +507,6 @@ window.togglePasswordVisibility = function(containerId, isMandoub = true) {
   }
 };
 
-// ========== دوال جديدة لحفظ معلومات التطبيق ==========
 window.saveAppInfo = async function() {
   try {
     const cfgRef = doc(db, 'config', 'global');
@@ -397,7 +527,6 @@ window.saveAppInfo = async function() {
   }
 };
 
-// ========== دوال جديدة لتخصيص الألوان ==========
 function setupColorSync(colorId, textId) {
   const colorInput = $(`#${colorId}`);
   const textInput = $(`#${textId}`);
@@ -472,132 +601,107 @@ window.resetThemeColors = async function() {
   await saveThemeColors();
 };
 
-// ========== دوال المشاركة الجديدة ==========
+// ========== متغيرات التقرير ==========
 let currentReportData = null;
 
-function exportToCSV(ordersData, mandoubName) {
-  let csvContent = "\uFEFFسلسلة,رقم الوصل,اسم الشركة,المحافظة,المنطقة,هاتف الزبون,المبلغ الكلي,أجر التوصيل,المبلغ الصافي,الحالة\n";
-  ordersData.forEach((order, idx) => {
-    csvContent += `${idx + 1},${order.wasl || '-'},${order.company || '-'},الأنبار,${order.area || '-'},${order.customerPhone || '-'},${fmtN(Math.abs(order.amount || 0))} د.ع,${fmtN(feePerOrder)} د.ع,${fmtN(Math.abs((order.amount || 0) - feePerOrder))} د.ع,${statusText(order.status)}\n`;
-  });
-  return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+// دالة تحويل التقرير إلى PDF
+async function exportReportToPDF(mandoubName, dateStr) {
+  const element = document.getElementById('accReportShell');
+  if (!element) return null;
+  const opt = {
+    margin: [5, 5, 5, 5],
+    filename: `تقرير_${mandoubName || 'محاسبة'}_${dateStr || new Date().toLocaleDateString('ar-IQ')}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, letterRendering: true, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  return html2pdf().set(opt).from(element).save();
 }
 
-async function shareAsExcel(mandoubName, ordersArray, totalAmount, deliveryFees, netAmount, totalOrders) {
-  const csvBlob = exportToCSV(ordersArray, mandoubName);
-  const file = new File([csvBlob], `تقرير_${mandoubName}_${new Date().toISOString().slice(0,10)}.csv`, { type: 'text/csv' });
-  
-  if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-    await navigator.share({ title: `تقرير ${mandoubName}`, text: `المبلغ الكلي: ${fmtN(Math.abs(totalAmount))} د.ع\nأجور المندوب: ${fmtN(deliveryFees)} د.ع\nالمبلغ الصافي: ${fmtN(Math.abs(netAmount))} د.ع\nعدد الطلبات: ${totalOrders}`, files: [file] });
-    toast.fire({ icon: 'success', title: 'تمت المشاركة كملف Excel' });
-  } else {
-    const url = URL.createObjectURL(csvBlob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `تقرير_${mandoubName}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.fire({ icon: 'success', title: 'تم تحميل الملف' });
+// دالة التحميل
+async function downloadReportAsPDF() {
+  if (!currentReportData) {
+    toast.fire({ icon: 'error', title: 'لا يوجد تقرير للتحميل' });
+    return;
+  }
+  Swal.fire({ title: 'جاري إنشاء PDF...', text: 'يرجى الانتظار', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+  try {
+    await exportReportToPDF(currentReportData.mandoubName, new Date().toLocaleDateString('ar-IQ'));
+    Swal.close();
+    toast.fire({ icon: 'success', title: 'تم تحميل التقرير كـ PDF' });
+  } catch(e) {
+    Swal.close();
+    toast.fire({ icon: 'error', title: 'تعذر تحميل التقرير: ' + e.message });
   }
 }
 
-async function shareAsImage() {
-  try {
-    const element = document.getElementById('accReportShell');
-    if (!element) return;
-    const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff' });
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    const file = new File([blob], `تقرير_محاسبة_${new Date().toISOString().slice(0,10)}.png`, { type: 'image/png' });
-    
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ title: 'تقرير محاسبة', files: [file] });
-      toast.fire({ icon: 'success', title: 'تمت المشاركة' });
-    } else {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `تقرير_محاسبة.png`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast.fire({ icon: 'success', title: 'تم حفظ الصورة' });
-    }
-  } catch(e) { toast.fire({ icon: 'error', title: 'تعذرت المشاركة' }); }
-}
-
-function printReport() {
-  const printContent = document.getElementById('accReportShell').cloneNode(true);
-  const originalTitle = document.title;
-  document.title = 'تقرير محاسبة';
-  const printWindow = window.open('', '_blank');
-  printWindow.document.write(`
-    <html dir="rtl"><head><title>تقرير محاسبة</title>
-    <style>
-      body { font-family: 'Cairo', sans-serif; padding: 20px; }
-      table { width: 100%; border-collapse: collapse; }
-      th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-      th { background: #0f2b3d; color: white; }
-      .box { background: #0f2b3d; color: white; padding: 10px; border-radius: 8px; text-align: center; }
-      .top-boxes { display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; }
-    </style>
-    </head><body>${printContent.innerHTML}</body></html>
-  `);
-  printWindow.document.close();
-  printWindow.print();
-  document.title = originalTitle;
-}
-
-async function showShareOptions(mandoubName, ordersArray, totalAmount, deliveryFees, netAmount, totalOrders) {
-  Swal.fire({
+// دالة المشاركة
+async function shareReportAsPDF() {
+  if (!currentReportData) {
+    toast.fire({ icon: 'error', title: 'لا يوجد تقرير للمشاركة' });
+    return;
+  }
+  
+  const result = await Swal.fire({
     title: '📤 مشاركة التقرير',
     html: `
       <div style="display:flex;flex-direction:column;gap:12px">
-        <button id="shareExcel" style="background:#10b981;color:white;padding:12px;border:none;border-radius:10px;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px">📊 ملف Excel/CSV</button>
-        <button id="shareImage" style="background:#3b82f6;color:white;padding:12px;border:none;border-radius:10px;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px">🖼️ صورة PNG</button>
-        <button id="sharePrint" style="background:#8b5cf6;color:white;padding:12px;border:none;border-radius:10px;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px">🖨️ طباعة / PDF</button>
-        <button id="shareWhatsAppDirect" style="background:#25D366;color:white;padding:12px;border:none;border-radius:10px;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px">💬 واتساب (نص)</button>
+        <button id="sharePdfDirectBtn" style="background:#dc2626;color:white;padding:12px;border:none;border-radius:10px;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer">📄 حفظ كـ PDF</button>
+        <button id="shareWhatsAppTextBtn" style="background:#25D366;color:white;padding:12px;border:none;border-radius:10px;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer">💬 مشاركة نص عبر واتساب</button>
+        <button id="sharePrintBtn" style="background:#8b5cf6;color:white;padding:12px;border:none;border-radius:10px;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer">🖨️ طباعة التقرير</button>
       </div>
     `,
     showConfirmButton: false,
     showCancelButton: true,
     cancelButtonText: 'إلغاء',
-    width: '400px',
-    didOpen: () => {
-      document.getElementById('shareExcel')?.addEventListener('click', async () => {
-        Swal.close();
-        await shareAsExcel(mandoubName, ordersArray, totalAmount, deliveryFees, netAmount, totalOrders);
-      });
-      document.getElementById('shareImage')?.addEventListener('click', async () => {
-        Swal.close();
-        await shareAsImage();
-      });
-      document.getElementById('sharePrint')?.addEventListener('click', () => {
-        Swal.close();
-        printReport();
-      });
-      document.getElementById('shareWhatsAppDirect')?.addEventListener('click', () => {
-        Swal.close();
-        const message = `📊 *تقرير محاسبة مندوب*\n\n🏍️ *المندوب:* ${mandoubName}\n📅 *التاريخ:* ${new Date().toLocaleDateString('ar-IQ')}\n\n💰 *المبلغ الكلي:* ${fmtN(Math.abs(totalAmount))} د.ع\n💵 *أجور المندوب:* ${fmtN(deliveryFees)} د.ع\n✅ *المبلغ الصافي:* ${fmtN(Math.abs(netAmount))} د.ع\n📦 *عدد الطلبات:* ${totalOrders}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-        toast.fire({ icon: 'success', title: 'تم فتح واتساب' });
-      });
-    }
+    width: '400px'
   });
+  
+  if (result.isDismissed) return;
+  
+  const handlePdf = async () => {
+    Swal.fire({ title: 'جاري إنشاء PDF...', text: 'يرجى الانتظار', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+    await exportReportToPDF(currentReportData.mandoubName, new Date().toLocaleDateString('ar-IQ'));
+    Swal.close();
+    toast.fire({ icon: 'success', title: 'تم حفظ التقرير كـ PDF' });
+  };
+  
+  const handleWhatsApp = () => {
+    const message = `📊 *تقرير محاسبة مندوب*\n\n🏍️ *المندوب:* ${currentReportData.mandoubName}\n📅 *التاريخ:* ${new Date().toLocaleDateString('ar-IQ')}\n\n💰 *المبلغ الكلي:* ${fmtN(Math.abs(currentReportData.totalAmount))} د.ع\n💵 *أجور المندوب:* ${fmtN(currentReportData.deliveryFees)} د.ع\n✅ *المبلغ الصافي:* ${fmtN(Math.abs(currentReportData.netAmount))} د.ع\n📦 *عدد الطلبات:* ${currentReportData.totalOrders}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    toast.fire({ icon: 'success', title: 'تم فتح واتساب' });
+  };
+  
+  const handlePrint = () => {
+    const printContent = document.getElementById('accReportShell').cloneNode(true);
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html dir="rtl"><head><title>تقرير محاسبة - ${currentReportData.mandoubName}</title>
+      <style>
+        body { font-family: 'Cairo', 'Tahoma', Arial, sans-serif; padding: 20px; direction: rtl; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background: #0f2b3d; color: white; }
+        .box { background: #0f2b3d; color: white; padding: 10px; border-radius: 8px; text-align: center; }
+        .top-boxes { display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; }
+      </style>
+      </head><body>${printContent.innerHTML}</body></html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+    toast.fire({ icon: 'success', title: 'تم فتح الطباعة' });
+  };
+  
+  const btnPdf = document.getElementById('sharePdfDirectBtn');
+  const btnWhatsApp = document.getElementById('shareWhatsAppTextBtn');
+  const btnPrint = document.getElementById('sharePrintBtn');
+  
+  if (btnPdf) btnPdf.onclick = () => { Swal.close(); handlePdf(); };
+  if (btnWhatsApp) btnWhatsApp.onclick = () => { Swal.close(); handleWhatsApp(); };
+  if (btnPrint) btnPrint.onclick = () => { Swal.close(); handlePrint(); };
 }
 
-async function downloadReportAsImage(fileName) {
-  try {
-    const element = document.getElementById('accReportShell');
-    if (!element) return;
-    const canvas = await html2canvas(element, { scale: 2, backgroundColor: '#ffffff' });
-    const link = document.createElement('a');
-    link.href = canvas.toDataURL('image/png');
-    link.download = `${fileName}.png`;
-    link.click();
-    toast.fire({ icon: 'success', title: 'تم تنزيل التقرير كصورة' });
-  } catch(e) { Swal.fire('خطأ', 'تعذر تنزيل التقرير', 'error'); }
-}
-
-// ========== التعديل 2: دالة generateReport المعدلة مع PDF واسم الشركة ==========
+// ========== دالة generateReport المعدلة مع الجدول المنظم ==========
 window.generateReport = async function(mandoubId) {
   try {
     Swal.fire({ title: 'جاري إنشاء التقرير', text: 'يرجى الانتظار...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
@@ -629,7 +733,8 @@ window.generateReport = async function(mandoubId) {
         <td style="padding:5px;border:1px solid #ddd">${counter}</td>
         <td style="padding:5px;border:1px solid #ddd"><span onclick="copyWaslNumber('${waslNumber}')" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${waslNumber}</span></td>
         <td style="padding:5px;border:1px solid #ddd">${order.company || 'غير معروف'}</td>
-        <td style="padding:5px;border:1px solid #ddd">الأنبار</td        <td style="padding:5px;border:1px solid #ddd">${order.area || 'غير محدد'}</td>
+        <td style="padding:5px;border:1px solid #ddd">الأنبار</td>
+        <td style="padding:5px;border:1px solid #ddd">${order.area || 'غير محدد'}</td>
         <td style="padding:5px;border:1px solid #ddd"><span class="phone-clickable" onclick="showCustomerPhoneMenu('${order.customerPhone || ''}', event)" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${order.customerPhone || 'لا يوجد'}</span></td>
         <td style="color:${amountColor};font-weight:bold;padding:5px;border:1px solid #ddd">${fmtN(Math.abs(orderAmount))} د.ع</td>
         <td style="color:#dc2626;font-weight:bold;padding:5px;border:1px solid #ddd">${fmtN(orderDeliveryFee)} د.ع</td>
@@ -643,16 +748,17 @@ window.generateReport = async function(mandoubId) {
     const opNumber = randOp();
     const currentDate = new Date().toLocaleDateString('ar-IQ');
     
-    $('#bxTotal').innerHTML = `المبلغ الكلي:<br><span style="font-size:14px">${fmtN(Math.abs(totalAmount))} د.ع</span>`;
-    $('#bxFees').innerHTML = `أجور المندوب:<br><span style="font-size:14px">${fmtN(deliveryFees)} د.ع (${feesPercentage}%)</span>`;
-    $('#bxNet').innerHTML = `المبلغ الصافي:<br><span style="font-size:14px;color:${netAmount < 0 ? '#dc2626' : '#0d9488'}">${fmtN(Math.abs(netAmount))} د.ع</span>`;
-    $('#bxOp').innerHTML = `رقم الكشف:<br><span style="font-size:12px">${opNumber}</span>`;
-    $('#bxDate').innerHTML = `التاريخ:<br><span style="font-size:12px">${currentDate}</span>`;
-    $('#bxCount').innerHTML = `عدد الطلبات:<br><span style="font-size:14px">${totalOrders}</span>`;
-    $('#reportMandoubName').innerHTML = `<strong>${mandoubData.name}</strong>`;
-    $('#footerMandoubName').innerHTML = mandoubData.name;
-    $('#footerAccountantName').innerHTML = ses.name || ses.user;
-    $('#accBody').innerHTML = htmlRows;
+    // تحديث الجدول المنظم
+    document.getElementById('bxTotalOrganized').innerHTML = fmtN(Math.abs(totalAmount)) + ' د.ع';
+    document.getElementById('bxFeesOrganized').innerHTML = fmtN(deliveryFees) + ' د.ع (' + feesPercentage + '%)';
+    document.getElementById('bxNetOrganized').innerHTML = fmtN(Math.abs(netAmount)) + ' د.ع';
+    document.getElementById('bxOpOrganized').innerHTML = opNumber;
+    document.getElementById('bxDateOrganized').innerHTML = currentDate;
+    document.getElementById('bxCountOrganized').innerHTML = totalOrders;
+    document.getElementById('reportMandoubNameOrganized').innerHTML = '<strong>' + mandoubData.name + '</strong>';
+    document.getElementById('footerMandoubNameOrganized').innerHTML = mandoubData.name;
+    document.getElementById('footerAccountantNameOrganized').innerHTML = ses.name || ses.user;
+    document.getElementById('accBodyOrganized').innerHTML = htmlRows;
     
     currentReportData = {
       mandoubName: mandoubData.name,
@@ -666,23 +772,9 @@ window.generateReport = async function(mandoubId) {
     Swal.close();
     $('#accReportWrapper').style.display = 'block';
     
-    // تحويل التقرير إلى PDF تلقائياً
-    setTimeout(async () => {
-      const element = document.getElementById('accReportShell');
-      const opt = {
-        margin: [5, 5, 5, 5],
-        filename: `تقرير_${mandoubData.name}_${currentDate}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, letterRendering: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(element).save();
-    }, 500);
-    
   } catch(e) { console.error('Report error:', e); Swal.close(); Swal.fire('خطأ', 'تعذر إنشاء التقرير: ' + e.message, 'error'); }
 };
 
-// ========== دالة viewReportDetails المعدلة لإظهار اسم الشركة ==========
 window.viewReportDetails = async function(sessionKey, mandoubName, archivedDate) {
   try {
     const reportsSnap = await getDocs(collection(db, 'financialArchive'));
@@ -710,7 +802,7 @@ window.viewReportDetails = async function(sessionKey, mandoubName, archivedDate)
         <td>${statusText(order.originalStatus)}</td>
        `;
     });
-    detailsHtml += '</tbody>\\u003C/table></div>';
+    detailsHtml += '</tbody></table></div>';
     Swal.fire({
       title: `📊 تفاصيل تقرير ${mandoubName} - ${archivedDate}`,
       html: detailsHtml,
@@ -728,7 +820,6 @@ window.viewReportDetails = async function(sessionKey, mandoubName, archivedDate)
 async function renderHome(){await loadConfig();const mandoubsSnap=await getDocs(collection(db,'mandoubs'));const ordersSnap=await getDocs(collection(db,'orders'));const mandoubStats={};mandoubsSnap.forEach(doc=>{const m=doc.data();mandoubStats[doc.id]={name:m.name,phone:m.phone,user:m.user,pending:0,delivered:0,delayed:0,rejected:0,totalAmount:0,deliveredCount:0};});ordersSnap.forEach(docSnap=>{const order=docSnap.data();const mid=order.mandoubId;if(mid&&mandoubStats[mid]){const s=order.status||'pending';if(s==='pending')mandoubStats[mid].pending++;else if(s==='delivered'){mandoubStats[mid].delivered++;mandoubStats[mid].deliveredCount++;mandoubStats[mid].totalAmount+=Number(order.amount||0);}else if(s==='delayed')mandoubStats[mid].delayed++;else if(s==='rejected')mandoubStats[mid].rejected++;}});let html=`<div class="card" style="border-color:#d4af37"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div><h3 style="margin:4px 0;color:#0f2b3d">🏠 الرئيسية - نظرة عامة على المندوبين</h3><p class="small-text">إحصائيات الطلبات والمبالغ لكل مندوب</p></div><div style="background:#0d9488;color:white;padding:8px 12px;border-radius:8px;font-size:12px"><strong>أجر التوصيل الحالي:</strong> ${fmtN(feePerOrder)} د.ع لكل طلب</div></div></div><div class="orders">`;Object.entries(mandoubStats).forEach(([id,stats])=>{const totalOrders=stats.pending+stats.delivered+stats.delayed+stats.rejected;const fees=stats.deliveredCount*feePerOrder;const netAmount=stats.totalAmount-fees;const feesPercentage=stats.totalAmount>0?((fees/stats.totalAmount)*100).toFixed(2):0;html+=`<div class="card" style="background:#fff;border-color:#e5e7eb"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4 style="margin:0;color:#333">🏍️ ${stats.name}</h4><span class="pill-count" style="background:#0f2b3d;color:white">${totalOrders} طلب</span></div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px"><div style="text-align:center;padding:10px;background:#eff6ff;border-radius:8px"><div style="font-size:20px;font-weight:bold;color:#1d4ed8">${stats.pending}</div><div style="font-size:12px;color:#4b5563">قيد التنفيذ</div></div><div style="text-align:center;padding:10px;background:#fef9c3;border-radius:8px"><div style="font-size:20px;font-weight:bold;color:#854d0e">${stats.delayed}</div><div style="font-size:12px;color:#4b5563">مؤجل</div></div><div style="text-align:center;padding:10px;background:#dcfce7;border-radius:8px"><div style="font-size:20px;font-weight:bold;color:#065f46">${stats.delivered}</div><div style="font-size:12px;color:#4b5563">واصل</div></div><div style="text-align:center;padding:10px;background:#fee2e2;border-radius:8px"><div style="font-size:20px;font-weight:bold;color:#7f1d1d">${stats.rejected}</div><div style="font-size:12px;color:#4b5563">مرفوض</div></div></div><div style="margin-top:10px;padding-top:10px;border-top:1px solid #e5e7eb"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;color:#666">المبلغ الكلي:</span><span style="font-weight:bold;color:#333">${fmtN(stats.totalAmount)} د.ع</span></div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:12px;color:#666">أجور التوصيل (${stats.deliveredCount} × ${fmtN(feePerOrder)}):</span><span style="font-weight:bold;color:#dc2626">${fmtN(fees)} د.ع (${feesPercentage}%)</span></div><div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:#666">المبلغ الصافي:</span><span style="font-weight:bold;color:#16a34a">${fmtN(netAmount)} د.ع</span></div></div><div style="margin-top:10px;display:flex;gap:5px"><button onclick="viewMandoubOrders('${id}')" style="flex:1;background:#3b82f6;color:white;border:none;padding:8px;border-radius:6px;font-size:12px;cursor:pointer">عرض الطلبات</button><button onclick="generateReport('${id}')" style="flex:1;background:#0d9488;color:white;border:none;padding:8px;border-radius:6px;font-size:12px;cursor:pointer">تقرير المحاسبة</button><button onclick="sendPushToMandoub('${id}')" style="flex:1;background:#8b5cf6;color:white;border:none;padding:8px;border-radius:6px;font-size:12px;cursor:pointer">📱 إشعار</button></div></div>`;});if(Object.keys(mandoubStats).length===0)html+=`<div class="card"><p style="text-align:center;color:#64748b;padding:20px">لا توجد مندوبين مسجلين حالياً</p></div>`;html+=`</div><div class="card" style="border-color:#d4af37;margin-top:20px"><h4 style="color:#0f2b3d;margin-top:0">📢 الإعلانات النشطة</h4><div id="activeAdsContainer"></div></div>`;content.innerHTML=html;setTimeout(()=>loadActiveAds(),100);}
 async function loadActiveAds(){try{const cfgRef=doc(db,'config','global');const snap=await getDoc(cfgRef);const container=$('#activeAdsContainer');if(!container)return;if(!snap.exists()){container.innerHTML='<p style="color:#64748b;text-align:center;padding:20px">لا توجد إعلانات مضافة</p>';return;}const config=snap.data();const ads=Array.isArray(config.ads)?config.ads:[];const activeAds=ads.filter(ad=>ad&&ad.status==='active');if(activeAds.length===0){container.innerHTML='<p style="color:#64748b;text-align:center;padding:20px">لا توجد إعلانات نشطة حالياً</p>';return;}let adsHtml='<div style="display:flex;overflow-x:auto;gap:15px;padding:10px 0">';activeAds.forEach(ad=>{if(!ad||!ad.title)return;adsHtml+=`<div style="min-width:280px;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;background:white;box-shadow:0 2px 8px rgba(0,0,0,0.1)">${ad.imageUrl?`<img src="${ad.imageUrl}" alt="${ad.title||'إعلان'}" style="width:100%;height:160px;object-fit:cover" onerror="this.style.display='none'">`:''}<div style="padding:15px"><h5 style="margin:0 0 8px;color:#1f2937;font-size:16px">${ad.title||'إعلان'}</h5><p style="margin:0 0 10px;color:#4b5563;font-size:14px;line-height:1.5">${ad.body||''}</p>${ad.link?`<a href="${ad.link}" target="_blank" style="display:inline-block;padding:6px 12px;background:#3b82f6;color:white;border-radius:6px;text-decoration:none;font-size:13px">عرض التفاصيل</a>`:''}</div></div>`;});adsHtml+='</div>';container.innerHTML=adsHtml;}catch(e){console.error(e);const c=$('#activeAdsContainer');if(c)c.innerHTML='<p style="color:#ef4444;text-align:center">تعذر تحميل الإعلانات</p>';}}
 
-// ========== عرض المندوبين مع كلمة المرور وزر الإظهار ==========
 async function renderMandoubs(){const ses=getSession();const f=roleFlags(ses.role);let html=`<div class="card" style="border-color:#d4af37"><h3 style="margin:0 0 15px;color:#0f2b3d">👥 المندوبون</h3><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><p class="small-text">إدارة مندوبي التوصيل في جميع المناطق</p>${f.isAdmin||f.isTech?`<button onclick="addNewMandoub()" class="btnx" style="background:#0d9488;color:white">➕ إضافة مندوب</button>`:''}</div></div>`;const mandoubsSnap=await getDocs(collection(db,'mandoubs'));if(mandoubsSnap.empty)html+=`<div class="card"><p style="text-align:center;color:#64748b;padding:20px">لا يوجد مندوبون مسجلون حالياً</p></div>`;else{html+=`<div style="margin-bottom:10px"><button id="togglePasswordBtn_mandoubsListContainer" onclick="togglePasswordVisibility('mandoubsListContainer', true)" class="btnx" style="background:#d4af37;color:#0f2b3d">👁️ إظهار الكلمات</button></div><div id="mandoubsListContainer">`;mandoubsSnap.forEach(doc=>{const m=doc.data();const statusColor=m.status==='active'?'#0d9488':'#dc2626';html+=`<div class="card" style="position:relative"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4 style="margin:0;color:#1e293b">🏍️ ${m.name}</h4><div style="display:flex;align-items:center;gap:5px"><span style="background:${statusColor};color:white;padding:4px 8px;border-radius:4px;font-size:11px">${m.status==='active'?'🟢 نشط':'🔴 موقوف'}</span><span class="sync-status ${m.isOnline?'sync-online':'sync-offline'}" style="font-size:11px">${m.isOnline?'🟢 متصل':'🔴 غير متصل'}</span></div></div><div style="margin-bottom:10px"><p style="margin:3px 0;font-size:13px"><span style="color:#64748b">📱 رقم:</span> ${m.phone||'لا يوجد'}</p><p style="margin:3px 0;font-size:13px"><span style="color:#64748b">👤 اسم المستخدم:</span> ${m.user||'لا يوجد'}</p><p style="margin:3px 0;font-size:13px"><span style="color:#64748b">🔑 كلمة المرور:</span> <span class="password-field" style="display:none;font-family:monospace;background:#f1f5f9;padding:2px 6px;border-radius:4px">${m.password||'********'}</span><span class="password-placeholder" style="color:#94a3b8">••••••••</span></p><p style="margin:3px 0;font-size:13px"><span style="color:#64748b">📍 منطقة التوزيع:</span> ${m.areaName||'لا توجد منطقة'}</p>${m.lastSeen?`<p style="margin:3px 0;font-size:12px;color:#94a3b8">🔄 آخر ظهور: ${formatDateTime(m.lastSeen)}</p>`:''}</div><div class="action-buttons"><button onclick="editMandoub('${doc.id}')" class="action-btn" style="background:#f59e0b;color:#111">✏️ تعديل</button><button onclick="toggleMandoubStatus('${doc.id}','${m.name}',${m.status==='active'?'false':'true'})" class="action-btn" style="background:${m.status==='active'?'#dc2626':'#0d9488'};color:white">${m.status==='active'?'⏸️ إيقاف':'▶️ تنشيط'}</button><button onclick="resetMandoubPassword('${doc.id}','${m.name}')" class="action-btn" style="background:#8b5cf6;color:white">🔑 إعادة تعيين</button></div></div>`;});html+=`</div>`;}content.innerHTML=html;}
 
 async function renderSearch(){let html=`<div class="card" style="border-color:#d4af37"><h3 style="margin:0 0 15px;color:#0f2b3d">🔎 البحث في الطلبات</h3><p class="small-text">اكتب للبحث تلقائياً في رقم الوصل أو رقم الهاتف</p><div class="search-bar"><input type="text" id="searchInput" placeholder="ابحث برقم الوصل أو رقم هاتف الزبون..." style="flex:1;padding:10px 12px;border-radius:8px;border:1px solid #d1d5db;font-size:14px"><select id="searchType" style="padding:10px;border-radius:8px;border:1px solid #d1d5db;background:white;font-size:14px"><option value="both">الكل (وصل وهاتف)</option><option value="wasl">رقم الوصل فقط</option><option value="customerPhone">رقم هاتف الزبون فقط</option></select><div id="searchLoader" style="padding:10px 20px;display:none"><span style="color:#3b82f6">جاري البحث...</span></div></div><p id="searchStats" class="small-text" style="margin-top:8px;color:#64748b;text-align:center"></p></div><div id="searchResults" style="margin-top:15px"></div>`;content.innerHTML=html;setupAutoSearch();}
@@ -818,10 +909,8 @@ function updateAmountDisplay() {
   amountDinar.className = isNegative ? 'amount-negative' : 'amount-positive';
 }
 
-// ========== عرض الإعدادات مع جميع الإضافات الجديدة ==========
 async function renderSettings(){const ses=getSession();const f=roleFlags(ses.role);if(!f.isAdmin&&!f.isTech){content.innerHTML=`<div class="card"><p style="text-align:center;color:#ef4444;padding:20px">🚫 غير مصرح لك بالوصول إلى هذه الصفحة</p></div>`;return;}const currentFee=await checkDeliveryFees();const cfgRef=doc(db,'config','global');const cfgSnap=await getDoc(cfgRef);const config=cfgSnap.exists()?cfgSnap.data():{feePerOrder:1000,managerLogoUrl:"https://i.imgur.com/Tj0vPZT.jpg",mandoubLogoUrl:"https://i.imgur.com/Tj0vPZT.jpg",timeFormat:"24h",dateFormat:"dd/mm/yyyy",areas:[],permissions:{},lastUpdated:serverTimestamp()};const areas=config.areas||[];let html=`<div class="card" style="border-color:#d4af37"><h3 style="margin:0 0 15px;color:#0f2b3d">⚙️ إعدادات النظام</h3><p class="small-text">إعدادات النظام العامة والمتغيرات</p></div><div class="card"><h4 style="color:#d4af37;margin-top:0">💰 أجور التوصيل</h4><div id="currentFeeDisplay" style="background:#0d9488;color:white;padding:12px;border-radius:8px;text-align:center;margin-bottom:15px"><strong>أجور التوصيل الحالية:</strong> ${fmtN(currentFee)} دينار لكل طلب واصل</div><div style="display:flex;align-items:center;gap:10px;margin-bottom:20px"><input type="number" id="feePerOrder" value="${config.feePerOrder}" min="0" step="100" style="flex:1;padding:12px;border-radius:8px;border:2px solid #d1d5db;font-size:16px;font-weight:bold"><span style="font-size:14px;color:#374151;font-weight:bold">دينار لكل طلب واصل</span><button onclick="updateFeePerOrder()" style="padding:12px 24px;background:#3b82f6;color:white;border:none;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer">💾 حفظ الأجور الجديدة</button></div><p class="small-text" style="background:#fef3c7;padding:10px;border-radius:6px;border:1px solid #f59e0b">💡 ملاحظة: سيتم تطبيق الأجور الجديدة على جميع التقارير القادمة. المبلغ الصافي = المبلغ الكلي - (عدد الطلبات × أجر التوصيل)</p></div><div class="card"><h4 style="color:#d4af37;margin-top:0">👑 إدارة الأدوار والصلاحيات</h4><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:15px"><p class="small-text">إضافة أدوار جديدة وتحديد الصلاحيات لكل دور</p><button onclick="addNewRole()" class="btnx" style="background:#0d9488;color:white">➕ إضافة دور جديد</button></div><div id="rolesListContainer"></div></div><div class="card"><h4 style="color:#d4af37;margin-top:0">👨‍💼 إدارة الموظفين</h4><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:15px"><p class="small-text">إدارة موظفي النظام وتحديد الصلاحيات</p><button onclick="addNewEmployee()" class="btnx" style="background:#0d9488;color:white">➕ إضافة موظف</button></div><div><button id="togglePasswordBtn_employeesListContainer" onclick="togglePasswordVisibility('employeesListContainer', false)" class="btnx" style="background:#d4af37;color:#0f2b3d;margin-bottom:10px">👁️ إظهار الكلمات</button></div><div id="employeesListContainer"></div></div><div class="card"><h4 style="color:#d4af37;margin-top:0">🏍️ إدارة المندوبين</h4><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:15px"><p class="small-text">إدارة مندوبي التوصيل في جميع المناطق</p><button onclick="addNewMandoub()" class="btnx" style="background:#0d9488;color:white">➕ إضافة مندوب</button></div><div><button id="togglePasswordBtn_mandoubsListContainer" onclick="togglePasswordVisibility('mandoubsListContainer', true)" class="btnx" style="background:#d4af37;color:#0f2b3d;margin-bottom:10px">👁️ إظهار الكلمات</button></div><div id="mandoubsListContainer"></div></div><div class="card"><h4 style="color:#d4af37;margin-top:0">🏢 الشعارات</h4><div style="margin-bottom:20px"><label style="display:block;margin-bottom:5px;font-size:14px;color:#374151">شعار تطبيق المدير</label><div style="display:flex;align-items:center;gap:10px"><input type="text" id="managerLogoUrl" value="${config.managerLogoUrl}" style="flex:1;padding:10px;border-radius:8px;border:1px solid #d1d5db;font-size:14px" placeholder="رابط صورة الشعار"><button onclick="updateManagerLogo()" style="padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:8px;cursor:pointer">حفظ</button></div>${config.managerLogoUrl?`<div style="margin-top:10px;text-align:center"><img src="${config.managerLogoUrl}" alt="شعار تطبيق المدير" style="max-width:150px;border-radius:10px;border:1px solid #d1d5db"></div>`:''}</div><div style="margin-bottom:20px"><label style="display:block;margin-bottom:5px;font-size:14px;color:#374151">شعار تطبيق المندوب</label><div style="display:flex;align-items:center;gap:10px"><input type="text" id="mandoubLogoUrl" value="${config.mandoubLogoUrl}" style="flex:1;padding:10px;border-radius:8px;border:1px solid #d1d5db;font-size:14px" placeholder="رابط صورة الشعار"><button onclick="updateMandoubLogo()" style="padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:8px;cursor:pointer">حفظ</button></div>${config.mandoubLogoUrl?`<div style="margin-top:10px;text-align:center"><img src="${config.mandoubLogoUrl}" alt="شعار تطبيق المندوب" style="max-width:150px;border-radius:10px;border:1px solid #d1d5db"></div>`:''}</div></div><div class="card"><h4 style="color:#d4af37;margin-top:0">📢 إدارة الإعلانات</h4><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:15px"><p class="small-text">إدارة الإعلانات في تطبيق المدير وتطبيق المندوب</p><button onclick="addNewAd()" class="btnx" style="background:#0d9488;color:white">➕ إضافة إعلان</button></div><div id="adsListContainer"></div></div><div class="card"><h4 style="color:#d4af37;margin-top:0">📍 إدارة المناطق</h4><div style="display:flex;gap:10px;margin-bottom:15px"><input type="text" id="newAreaName" placeholder="اسم المنطقة الجديدة" style="flex:1;padding:10px;border-radius:8px;border:1px solid #d1d5db;font-size:14px"><button onclick="addNewArea()" style="padding:10px 20px;background:#0d9488;color:white;border:none;border-radius:8px;cursor:pointer">➕ إضافة منطقة</button></div><div id="areasList" style="margin-top:15px">${areas.map(area=>`<span class="area-tag">${area}<button onclick="deleteArea('${area}')" style="background:none;border:none;color:#dc2626;cursor:pointer;margin-right:5px">×</button></span>`).join('')}${areas.length===0?'<p style="color:#6b7280;text-align:center">لا توجد مناطق مضافة</p>':''}</div></div>
 
-<!-- ========== قسم معلومات التطبيق الجديد ========== -->
 <div class="card">
   <h4 style="color:#d4af37;margin-top:0">ℹ️ معلومات حول التطبيق</h4>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -859,7 +948,6 @@ async function renderSettings(){const ses=getSession();const f=roleFlags(ses.rol
   <button onclick="saveAppInfo()" class="btn" style="margin-top:15px;background:#d4af37;color:#0f2b3d">💾 حفظ معلومات التطبيق</button>
 </div>
 
-<!-- ========== قسم هيكلية التطبيق الجديد (تخصيص الألوان) ========== -->
 <div class="card">
   <h4 style="color:#d4af37;margin-top:0">🎨 هيكلية التطبيق - تخصيص الألوان</h4>
   <p class="small-text">قم بتخصيص ألوان التطبيق حسب هوية شركتك</p>
@@ -920,13 +1008,11 @@ async function renderSettings(){const ses=getSession();const f=roleFlags(ses.rol
 
 async function renderAbout(){const ses=getSession();let html=`<div class="card" style="border-color:#d4af37;text-align:center"><div style="margin-bottom:20px">${managerLogoUrl?`<img src="${managerLogoUrl}" alt="شعار البغدادي" style="width:120px;height:120px;border-radius:20px;object-fit:cover;border:2px solid #d4af37;box-shadow:0 4px 12px rgba(212,175,55,0.3)">`:''}</div><h2 style="color:#d4af37;margin:0 0 10px">البغدادي للتوصيل السريع</h2><h3 style="color:#0f2b3d;margin:0 0 20px">نظام الإدارة المركزية</h3><div style="background:#f8fafc;padding:20px;border-radius:12px;margin:20px 0;text-align:right"><h4 style="color:#0f172a;margin-top:0">📋 عن النظام</h4><p style="line-height:1.6;color:#374151">نظام متكامل لإدارة عمليات التوصيل والمندوبين. يتيح النظام للمدراء متابعة الطلبات، إدارة المندوبين، إنشاء التقارير المالية، وإرسال الإشعارات. كما يتضمن نظام صلاحيات متكامل وإدارة إعلانات.</p></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin:20px 0"><div style="background:#eff6ff;padding:15px;border-radius:8px"><div style="font-size:24px">⚡</div><h4 style="color:#1d4ed8;margin:10px 0">سرعة التوصيل</h4><p style="color:#4b5563;font-size:14px">نضمن وصول طلباتك في أسرع وقت ممكن</p></div><div style="background:#f0fdf4;padding:15px;border-radius:8px"><div style="font-size:24px">🛡️</div><h4 style="color:#065f46;margin:10px 0">حماية وأمان</h4><p style="color:#4b5563;font-size:14px">نظام متكامل لحماية بياناتك وطلباتك</p></div><div style="background:#fef3c7;padding:15px;border-radius:8px"><div style="font-size:24px">📱</div><h4 style="color:#92400e;margin:10px 0">تتبع مباشر</h4><p style="color:#4b5563;font-size:14px">تتبع طلباتك في الوقت الفعلي</p></div><div style="background:#fef2f2;padding:15px;border-radius:8px"><div style="font-size:24px">👥</div><h4 style="color:#991b1b;margin:10px 0">دعم فني</h4><p style="color:#4b5563;font-size:14px">فريق دعم فني متاح على مدار الساعة</p></div></div><div style="background:#f8fafc;padding:20px;border-radius:12px;margin:20px 0;text-align:right"><h4 style="color:#0f172a;margin-top:0">📊 معلومات النظام</h4><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;text-align:right"><div><strong>👤 المستخدم الحالي:</strong><p style="margin:5px 0;color:#374151">${ses?.name||'غير معروف'}</p></div><div><strong>🎭 الدور:</strong><p style="margin:5px 0;color:#374151">${ses?.role||'غير معروف'}</p></div><div><strong>📱 إصدار التطبيق:</strong><p style="margin:5px 0;color:#374151">v3.0.0</p></div><div><strong>📅 تاريخ التحديث:</strong><p style="margin:5px 0;color:#374151">${new Date().toLocaleDateString('ar-IQ')}</p></div></div></div><div style="margin-top:25px;padding-top:20px;border-top:1px solid #e5e7eb"><p style="color:#6b7280;font-size:14px">📧 للتواصل: <a href="mailto:support@bagdadi.com" style="color:#3b82f6">support@bagdadi.com</a><br>📞 الهاتف: 0770-123-4567</p><p style="color:#9ca3af;font-size:12px;margin-top:15px">© 2025 البغدادي للتوصيل السريع. جميع الحقوق محفوظة.</p></div></div>`;content.innerHTML=html;}
 
-// ========== التعديل 3: دالة submitNewOrder مع السماح بالمبلغ 0 ==========
 async function submitNewOrder(){const wasl=$('#wasl').value.trim();const mandoubId=$('#mandoubId').value;const area=$('#area').value.trim();const gov=$('#gov').value;const amountStr=$('#amount').value.trim().replace(',','.');const customerPhone=$('#customerPhone').value.trim();const company=$('#company').value.trim();const note=$('#note').value.trim();const notes_fragile=$('#notes_fragile').checked;const notes_urgent=$('#notes_urgent').checked;const notes_no_open=$('#notes_no_open').checked;const isNegative=$('#amountNegative').checked;if(!wasl){toast.fire({icon:'error',title:'❌ أدخل رقم الوصل'});$('#wasl').focus();return;}if(!mandoubId){toast.fire({icon:'error',title:'❌ اختر المندوب المسؤول'});return;}if(!area){toast.fire({icon:'error',title:'❌ المنطقة مطلوبة'});return;}let amountNum=parseFloat(amountStr);if(isNaN(amountNum)){toast.fire({icon:'error',title:'❌ أدخل سعراً صحيحاً'});$('#amount').focus();return;}if(amountNum<0 && !isNegative){toast.fire({icon:'error',title:'❌ إذا كان السعر سالباً، حدد مربع "سالب"'});return;}if(isNegative && amountNum>0)amountNum=-amountNum;if(!customerPhone){toast.fire({icon:'error',title:'❌ أدخل رقم هاتف الزبون'});$('#customerPhone').focus();return;}if(!company){toast.fire({icon:'error',title:'❌ أدخل اسم الشركة'});$('#company').focus();return;}try{const ses=getSession();const amountInDinar=amountNum*AMOUNT_UNIT;const orderData={wasl,mandoubId,area,gov,amount:amountInDinar,customerPhone,company,note:note||null,notes_fragile,notes_urgent,notes_no_open,status:'pending',createdBy:ses.name||ses.user,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),isNegative:isNegative};await addDoc(collection(db,'orders'),orderData);const mandoubDoc=await getDoc(doc(db,'mandoubs',mandoubId));if(mandoubDoc.exists()){const mandoubData=mandoubDoc.data();await addDoc(collection(db,'notifications'),{mandoubId,mandoubName:mandoubData.name,title:'📦 طلب جديد',body:`طلب جديد من ${company} بقيمة ${fmtN(Math.abs(amountInDinar))} دينار ${isNegative?'(سالب)':''}`,type:'new_order',orderWasl:wasl,sentBy:ses.name||'المدير',sentAt:serverTimestamp(),read:false});if(notes_fragile||notes_urgent||notes_no_open){let warningMsg='';if(notes_fragile)warningMsg+='⚡ قابل للكسر ';if(notes_urgent)warningMsg+='🚨 مستعجل ';if(notes_no_open)warningMsg+='⛔ عدم فتح ';await addDoc(collection(db,'notifications'),{mandoubId,mandoubName:mandoubData.name,title:'⚠️ تنبيه مهم',body:`${warningMsg}- الرجاء التعامل بحذر`,type:'order_warning',orderWasl:wasl,sentBy:ses.name||'المدير',sentAt:serverTimestamp(),read:false});}}$('#wasl').value='';$('#customerPhone').value='';$('#company').value='';$('#amount').value='';$('#amountDinar').value='';$('#note').value='';$('#amountNegative').checked=false;$('#notes_fragile').checked=false;$('#notes_urgent').checked=false;$('#notes_no_open').checked=false;updateAmountDisplay();Swal.fire({icon:'success',title:'✅ تم إضافة الطلب بنجاح',text:`رقم الوصل: ${wasl}`,timer:2000,showConfirmButton:false,toast:true,position:'top'});$('#wasl').focus();}catch(e){console.error('Error adding order:',e);Swal.fire('خطأ','تعذر إضافة الطلب: '+e.message,'error');}}
 async function filterArchive(filter){window.currentArchiveFilter=filter;try{let ordersQuery;if(filter==='date'){const{value:date}=await Swal.fire({title:'اختر التاريخ',input:'date',inputValue:todayISO()});if(!date)return;const startDate=new Date(date);const endDate=new Date(date);endDate.setDate(endDate.getDate()+1);ordersQuery=query(collection(db,'orders'),where('createdAt','>=',startDate),where('createdAt','<',endDate));}else if(filter==='all'){const allOrders=await getDocs(collection(db,'orders'));const results=allOrders.docs.filter(doc=>{const order=doc.data();return order.status==='delivered'||order.status==='rejected'||order.status==='temp'||(order.note&&order.note.includes('راجع مخزن'));});displayArchiveResults(results);return;}else if(filter==='deleted'){const allOrders=await getDocs(collection(db,'orders'));const results=allOrders.docs.filter(doc=>{const order=doc.data();return order.note&&order.note.includes('تم حذف الطلب');});displayArchiveResults(results);return;}else if(filter==='returned'){const allOrders=await getDocs(collection(db,'orders'));const results=allOrders.docs.filter(doc=>{const order=doc.data();return order.note&&order.note.includes('راجع مخزن');});displayArchiveResults(results);return;}else{ordersQuery=query(collection(db,'orders'),where('status','==',filter));}const querySnap=await getDocs(ordersQuery);displayArchiveResults(querySnap.docs);}catch(e){console.error('Archive error:',e);Swal.fire('خطأ','تعذر تحميل الأرشيف','error');}}
 function displayArchiveResults(docs){const resultsDiv=$('#archiveResults');if(docs.length===0){resultsDiv.innerHTML=`<div class="card"><p style="text-align:center;color:#64748b;padding:20px">📭 لا توجد طلبات في الأرشيف</p></div>`;return;}let html='<div class="orders">';docs.forEach(docSnap=>{const order=docSnap.data();const createdAt=formatDateTime(order.createdAt);const isArchived=order.status==='delivered'||order.status==='rejected'||order.status==='temp'||(order.note&&order.note.includes('راجع مخزن'));const bgColor=isArchived?'#f3f4f6':'#ffffff';const textColor=isArchived?'#6b7280':'#111827';const amountColor=order.amount<0?'#dc2626':'#0d9488';const amountPrefix=order.amount<0?'🔴':'💰';html+=`<div class="order-card arch-card" style="background:${bgColor};color:${textColor}"><div style="flex:1"><p style="font-weight:800;margin:0 0 5px">${order.company||'غير معروف'}</p><p style="margin:0 0 3px;font-size:12px">📋 الوصل: <span class="wasl-copyable" onclick="copyWaslNumber('${order.wasl||''}')" style="color:${textColor};text-decoration:underline;text-decoration-style:dashed">${order.wasl||'لا يوجد'}</span></p><p style="margin:0 0 3px;font-size:12px">📍 ${order.area||'غير معروف'} - ${order.gov||'الأنبار'}</p><p style="margin:0 0 3px;font-size:12px">📞 <span class="phone-clickable" onclick="showCustomerPhoneMenu('${order.customerPhone||''}', event)" style="color:${textColor};text-decoration:underline;text-decoration-style:dotted">${order.customerPhone||'لا يوجد'}</span></p><p style="margin:0 0 3px;font-size:12px"><span style="color:${amountColor};font-weight:bold">${amountPrefix} ${fmtN(Math.abs(Number(order.amount||0)))} د.ع</span>${order.isNegative?'<span style="background:#dc2626;color:white;padding:2px 5px;border-radius:4px;font-size:9px;margin-right:5px">سالب</span>':''}</p><p style="margin:0 0 3px;font-size:12px">🎭 ${statusText(order.status)}</p><p style="margin:0 0 5px;font-size:11px">📅 ${createdAt}</p>${order.notes_fragile||order.notes_urgent||order.notes_no_open?`<div class="notes-badges">${order.notes_fragile?'<span class="notes-badge notes-fragile">⚡ قابل للكسر</span>':''}${order.notes_urgent?'<span class="notes-badge notes-urgent">🚨 مستعجل</span>':''}${order.notes_no_open?'<span class="notes-badge notes-no-open">⛔ عدم فتح</span>':''}</div>`:''}${order.note?`<p style="margin:5px 0 0;font-size:11px">📝 ${order.note}</p>`:''}</div><div class="actions" style="margin-top:8px">${order.note&&order.note.includes('راجع مخزن')?'':`<button onclick="restoreOrder('${docSnap.id}')" class="btnx btnx-green" style="font-size:11px">استعادة</button><button onclick="viewOrderDetails('${docSnap.id}')" class="btnx" style="background:#3b82f6;color:white;font-size:11px">عرض</button><button onclick="deleteOrderPermanently('${docSnap.id}')" class="btnx btnx-red" style="font-size:11px">حذف نهائي</button>`}</div></div>`;});html+='</div>';resultsDiv.innerHTML=html;}
 async function loadNotifications(){try{const ses=getSession();let notificationsQuery;const f=roleFlags(ses.role);if(f.isAdmin||f.isTech||f.isExec){notificationsQuery=query(collection(db,'notifications'),orderBy('sentAt','desc'),limit(50));}else{notificationsQuery=query(collection(db,'notifications'),where('mandoubId','==',ses.id),orderBy('sentAt','desc'),limit(30));}const notificationsSnap=await getDocs(notificationsQuery);const notificationsDiv=$('#notificationsList');if(notificationsSnap.empty){notificationsDiv.innerHTML=`<div class="card"><p style="text-align:center;color:#64748b;padding:20px">📭 لا توجد إشعارات حالياً</p></div>`;return;}let html='<div class="orders">';notificationsSnap.forEach(doc=>{const n=doc.data();const sentAt=formatDateTime(n.sentAt);const isRead=n.read||false;html+=`<div class="card" style="border-left:4px solid ${isRead?'#d1d5db':'#3b82f6'};background:${isRead?'#f9fafb':'#ffffff'}"><div style="display:flex;justify-content:space-between;align-items:start"><div style="flex:1"><h4 style="margin:0 0 8px;color:#1f2937">${n.title||'إشعار'}</h4><p style="margin:0 0 8px;color:#4b5563">${n.body||''}</p><div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><span style="font-size:12px;color:#6b7280">👤 ${n.sentBy||'النظام'} • 📅 ${sentAt}${n.mandoubName?` • 🏍️ ${n.mandoubName}`:''}</span>${!isRead?`<button onclick="markNotificationRead('${doc.id}')" style="padding:4px 8px;background:#3b82f6;color:white;border:none;border-radius:4px;font-size:11px;cursor:pointer">تم القراءة</button>`:''}</div></div></div></div>`;});html+='</div>';notificationsDiv.innerHTML=html;}catch(e){console.error('Notifications error:',e);$('#notificationsList').innerHTML=`<div class="card"><p style="text-align:center;color:#ef4444;padding:20px">❌ تعذر تحميل الإشعارات</p></div>`;}}
 
-// ========== التعديل 4: دالة updateOrderStatus مع آخر تحديث ديناميكي ==========
 window.updateOrderStatus = async function(orderId, status) {
   try {
     const ses = getSession();
@@ -1448,17 +1534,17 @@ window.viewOrderDetails = async function(orderId) {
     const amountPrefix = order.amount < 0 ? '🔴' : '💰';
     Swal.fire({
       title: `تفاصيل الطلب: ${order.company}`,
-      html: `<div style="text-align:right;font-size:14px"><table style="width:100%;border-collapse:collapse">  <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📋 رقم الوصل:</strong> </td><td style="padding:8px;border-bottom:1px solid #e5e7eb"><span onclick="copyWaslNumber('${order.wasl || ''}')" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${order.wasl || 'لا يوجد'}</span><span style="font-size:11px;color:#6b7280;margin-right:8px">(اضغط للنسخ)</span>      </td></tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🏢 الشركة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.company}</td></tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📞 الهاتف:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb"><span onclick="showCustomerPhoneMenu('${order.customerPhone || ''}', event)" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${order.customerPhone}</span><span style="font-size:11px;color:#6b7280;margin-right:8px">(اضغط للخيارات)</span></td></tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📍 الموقع:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.area} - ${order.gov}</td></tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🏍️ المندوب:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${mandoubName}</td></tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>💰 المبلغ:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb"><span style="color:${amountColor};font-weight:bold">${amountPrefix} ${fmtN(Math.abs(order.amount))} دينار</span>${order.isNegative ? '<span style="background:#dc2626;color:white;padding:2px 5px;border-radius:4px;font-size:11px;margin-right:5px">سالب</span>' : ''}</td></tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🎭 الحالة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${statusText(order.status)}</td></tr>
-            ${notes.length > 0 ? `<tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>⚠️ ملاحظات:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${notes.join('، ')}</td></tr>` : ''}
-            ${order.note ? `<tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>💬 ملاحظة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.note}</td></tr>` : ''}
-            <tr><td style="padding:8px"><strong>📅 التاريخ:</strong></td><td style="padding:8px">${formatDateTime(order.createdAt)}</td></tr>
-          </table></div>`,
+      html: `<div style="text-align:right;font-size:14px"><table style="width:100%;border-collapse:collapse">  <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📋 رقم الوصل:</strong> </td><td style="padding:8px;border-bottom:1px solid #e5e7eb"><span onclick="copyWaslNumber('${order.wasl || ''}')" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${order.wasl || 'لا يوجد'}</span><span style="font-size:11px;color:#6b7280;margin-right:8px">(اضغط للنسخ)</span>       </tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🏢 الشركة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.company}</tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📞 الهاتف:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb"><span onclick="showCustomerPhoneMenu('${order.customerPhone || ''}', event)" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${order.customerPhone}</span><span style="font-size:11px;color:#6b7280;margin-right:8px">(اضغط للخيارات)</span></tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📍 الموقع:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.area} - ${order.gov}</tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🏍️ المندوب:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${mandoubName}</tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>💰 المبلغ:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb"><span style="color:${amountColor};font-weight:bold">${amountPrefix} ${fmtN(Math.abs(order.amount))} دينار</span>${order.isNegative ? '<span style="background:#dc2626;color:white;padding:2px 5px;border-radius:4px;font-size:11px;margin-right:5px">سالب</span>' : ''}</tr>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🎭 الحالة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${statusText(order.status)}</tr>
+            ${notes.length > 0 ? `<tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>⚠️ ملاحظات:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${notes.join('، ')}</tr>` : ''}
+            ${order.note ? `<tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>💬 ملاحظة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.note}</tr>` : ''}
+            <tr><td style="padding:8px"><strong>📅 التاريخ:</strong></td><td style="padding:8px">${formatDateTime(order.createdAt)}</tr>
+           ⇂/table></div>`,
       width: 600,
       showCloseButton: true,
       showConfirmButton: false
@@ -1709,7 +1795,6 @@ window.downloadReportImage = async function(sessionKey, mandoubName, archivedDat
   }
 };
 
-// ========== التعديل 5: دالة shareExistingReport المعدلة (المشاركة كـ PDF بنفس الهيكلية) ==========
 window.shareExistingReport = async function(sessionKey, mandoubName, archivedDate) {
   try {
     const element = document.getElementById('accReportShell');
@@ -1750,7 +1835,6 @@ window.shareExistingReport = async function(sessionKey, mandoubName, archivedDat
     };
     
     const handleShareWhatsApp = () => {
-      // استخراج النص من التقرير للمشاركة
       const mandoubNameEl = document.getElementById('reportMandoubName');
       const totalAmountEl = document.getElementById('bxTotal');
       const feesEl = document.getElementById('bxFees');
@@ -1842,11 +1926,14 @@ window.refreshAllData = function() { renderSettings(); toast.fire({ icon: 'succe
 window.testSystem = async function() { try { const testRef = doc(db, 'config', 'global'); const testSnap = await getDoc(testRef); if (testSnap.exists()) { Swal.fire('✅ اختبار النظام', 'الاتصال مع قاعدة البيانات يعمل بشكل صحيح', 'success'); } else { Swal.fire('⚠️ اختبار النظام', 'الاتصال يعمل ولكن لا توجد بيانات تخزين', 'info'); } } catch (e) { Swal.fire('❌ اختبار النظام', `خطأ في الاتصال: ${e.message}`, 'error'); } };
 window.markNotificationRead = async function(notificationId) { try { await updateDoc(doc(db, 'notifications', notificationId), { read: true, readAt: serverTimestamp() }); loadNotifications(); } catch (e) { console.error(e); } };
 window.clearAllNotifications = async function() { const result = await Swal.fire({ title: 'مسح جميع الإشعارات', text: 'هل أنت متأكد من مسح جميع الإشعارات؟', icon: 'warning', showCancelButton: true, confirmButtonText: 'نعم، امسح الكل', cancelButtonText: 'إلغاء', confirmButtonColor: '#ef4444' }); if (result.isConfirmed) { try { const notificationsSnap = await getDocs(collection(db, 'notifications')); const deletePromises = notificationsSnap.docs.map(doc => deleteDoc(doc.ref)); await Promise.all(deletePromises); toast.fire({ icon: 'success', title: 'تم مسح جميع الإشعارات' }); loadNotifications(); } catch (e) { console.error(e); Swal.fire('خطأ', 'تعذر مسح الإشعارات', 'error'); } } };
+
+// ========== ربط أزرار التحميل والمشاركة الجديدة ==========
 $('#accBackBtn').onclick = () => { $('#accReportWrapper').style.display = 'none'; };
-$('#accDownloadBtn').onclick = () => { if (currentReportData) { downloadReportAsImage(`تقرير_${currentReportData.mandoubName}_${new Date().toISOString().slice(0, 10)}`); } else { downloadReportAsImage(`تقرير_محاسبة_${new Date().toISOString().slice(0, 10)}`); } };
-$('#accShareBtn').onclick = () => { if (currentReportData) { showShareOptions(currentReportData.mandoubName, currentReportData.ordersArray, currentReportData.totalAmount, currentReportData.deliveryFees, currentReportData.netAmount, currentReportData.totalOrders); } else { toast.fire({ icon: 'error', title: 'لا يوجد تقرير للمشاركة' }); } };
+$('#accDownloadBtn').onclick = () => { downloadReportAsPDF(); };
+$('#accShareBtn').onclick = () => { shareReportAsPDF(); };
+
 async function init() { await loadConfig(); applyBranding(); applyTheme(); requireLogin(); }
 init();
 </script>
 </body>
-</html>
+  </html>
