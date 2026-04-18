@@ -420,7 +420,7 @@
 
       <table class="data-table-organized" id="accTableOrganized">
         <thead>
-          <tr><th>#</th><th>رقم الوصل</th><th>اسم الشركة</th><th>المحافظة</th><th>المنطقة</th><th>هاتف الزبون</th><th>المبلغ الكلي</th><th>أجر التوصيل</th><th>المبلغ الصافي</th><th>الحالة</th></tr>
+          <tr><th>#</th><th>رقم الوصل</th><th>اسم الشركة</th><th>المحافظة</th><th>المنطقة</th><th>هاتف الزبون</th><th>المبلغ الكلي</th><th>أجر التوصيل</th><th>المبلغ الصافي</th><th>الحالة / ملاحظات السعر</th></tr>
         </thead>
         <tbody id="accBodyOrganized"></tbody>
       </table>
@@ -701,7 +701,7 @@ async function shareReportAsPDF() {
   if (btnPrint) btnPrint.onclick = () => { Swal.close(); handlePrint(); };
 }
 
-// ========== دالة generateReport المعدلة مع الجدول المنظم ==========
+// ========== دالة generateReport المعدلة لعرض ملاحظات تغير السعر ==========
 window.generateReport = async function(mandoubId) {
   try {
     Swal.fire({ title: 'جاري إنشاء التقرير', text: 'يرجى الانتظار...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
@@ -729,6 +729,18 @@ window.generateReport = async function(mandoubId) {
       netAmount += orderNetAmount;
       const waslNumber = order.wasl || `طلب-${counter}`;
       const amountColor = orderAmount < 0 ? '#dc2626' : '#0d9488';
+      
+      // استخراج ملاحظة تغير السعر من حقل الملاحظات إذا وجدت
+      let priceChangeNote = '';
+      if (order.note && (order.note.includes('تغير السعر') || order.note.includes('💰'))) {
+        const match = order.note.match(/تغير السعر من \(([^)]+)\) إلى \(([^)]+)\)/);
+        if (match) {
+          priceChangeNote = `<br><span style="font-size:10px; color:#fbbf24;">💰 السعر القديم: ${match[1]} → السعر الجديد: ${match[2]}</span>`;
+        } else {
+          priceChangeNote = `<br><span style="font-size:10px; color:#fbbf24;">${order.note.substring(0, 50)}</span>`;
+        }
+      }
+      
       htmlRows += `<tr>
         <td style="padding:5px;border:1px solid #ddd">${counter}</td>
         <td style="padding:5px;border:1px solid #ddd"><span onclick="copyWaslNumber('${waslNumber}')" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${waslNumber}</span></td>
@@ -736,10 +748,10 @@ window.generateReport = async function(mandoubId) {
         <td style="padding:5px;border:1px solid #ddd">الأنبار</td>
         <td style="padding:5px;border:1px solid #ddd">${order.area || 'غير محدد'}</td>
         <td style="padding:5px;border:1px solid #ddd"><span class="phone-clickable" onclick="showCustomerPhoneMenu('${order.customerPhone || ''}', event)" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${order.customerPhone || 'لا يوجد'}</span></td>
-        <td style="color:${amountColor};font-weight:bold;padding:5px;border:1px solid #ddd">${fmtN(Math.abs(orderAmount))} د.ع</td>
+        <td style="color:${amountColor};font-weight:bold;padding:5px;border:1px solid #ddd">${fmtN(Math.abs(orderAmount))} د.ع${priceChangeNote}</td>
         <td style="color:#dc2626;font-weight:bold;padding:5px;border:1px solid #ddd">${fmtN(orderDeliveryFee)} د.ع</td>
         <td style="color:${orderNetAmount < 0 ? '#dc2626' : '#0d9488'};font-weight:bold;padding:5px;border:1px solid #ddd">${fmtN(Math.abs(orderNetAmount))} د.ع</td>
-        <td style="padding:5px;border:1px solid #ddd">${statusText(order.status)}</td>
+        <td style="padding:5px;border:1px solid #ddd">${statusText(order.status)}${priceChangeNote}</td>
        `;
       counter++;
     });
@@ -785,10 +797,17 @@ window.viewReportDetails = async function(sessionKey, mandoubName, archivedDate)
       if (key === sessionKey) sessionOrders.push(report);
     });
     const deliveredOrders = sessionOrders.filter(o => o.originalStatus === 'delivered');
-    let detailsHtml = '<div style="max-height:500px;overflow-y:auto;text-align:right"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:#0f2b3d;color:white"><th>#</th><th>رقم الوصل</th><th>اسم الشركة</th><th>المحافظة</th><th>المنطقة</th><th>هاتف الزبون</th><th>المبلغ الكلي</th><th>أجر التوصيل</th><th>المبلغ الصافي</th><th>الحالة</th> </tr></thead><tbody>';
+    let detailsHtml = '<div style="max-height:500px;overflow-y:auto;text-align:right"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="background:#0f2b3d;color:white"><th>#</th><th>رقم الوصل</th><th>اسم الشركة</th><th>المحافظة</th><th>المنطقة</th><th>هاتف الزبون</th><th>المبلغ الكلي</th><th>أجر التوصيل</th><th>المبلغ الصافي</th><th>الحالة</th>  </tr></thead><tbody>';
     deliveredOrders.forEach((order, idx) => {
       const amountColor = order.amount < 0 ? '#dc2626' : '#0d9488';
       const netAmount = (order.amount || 0) - (order.feePerOrder || 1000);
+      let priceChangeNote = '';
+      if (order.note && (order.note.includes('تغير السعر') || order.note.includes('💰'))) {
+        const match = order.note.match(/تغير السعر من \(([^)]+)\) إلى \(([^)]+)\)/);
+        if (match) {
+          priceChangeNote = `<br><span style="font-size:10px;">💰 السعر القديم: ${match[1]} → الجديد: ${match[2]}</span>`;
+        }
+      }
       detailsHtml += `<tr>
         <td>${idx + 1}</td>
         <td><span onclick="copyWaslNumber('${order.wasl || ''}')" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${order.wasl || '-'}</span></td>
@@ -796,10 +815,10 @@ window.viewReportDetails = async function(sessionKey, mandoubName, archivedDate)
         <td>الأنبار</td>
         <td>${order.area || '-'}</td>
         <td><span class="phone-clickable" onclick="showCustomerPhoneMenu('${order.customerPhone || ''}', event)" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${order.customerPhone || '-'}</span></td>
-        <td><span style="color:${amountColor};font-weight:bold">${fmtN(Math.abs(order.amount || 0))} د.ع</span></td>
+        <td><span style="color:${amountColor};font-weight:bold">${fmtN(Math.abs(order.amount || 0))} د.ع</span>${priceChangeNote}</td>
         <td><span style="color:#dc2626;font-weight:bold">${fmtN(order.feePerOrder || 1000)} د.ع</span></td>
         <td><span style="color:${netAmount < 0 ? '#dc2626' : '#0d9488'};font-weight:bold">${fmtN(Math.abs(netAmount))} د.ع</span></td>
-        <td>${statusText(order.originalStatus)}</td>
+        <td>${statusText(order.originalStatus)}${priceChangeNote}</td>
        `;
     });
     detailsHtml += '</tbody></table></div>';
@@ -842,9 +861,14 @@ async function displayAutoSearchResults(orders){
       const mandoubDoc = await getDoc(doc(db, 'mandoubs', order.mandoubId));
       if(mandoubDoc.exists()) mandoubName = mandoubDoc.data().name;
     }
+    // عرض ملاحظة تغير السعر في بطاقة البحث
+    let priceChangeBadge = '';
+    if (order.note && (order.note.includes('تغير السعر') || order.note.includes('💰'))) {
+      priceChangeBadge = '<span style="background:#fbbf24;color:#111;padding:2px 6px;border-radius:4px;font-size:10px;margin-right:5px">💰 تغير السعر</span>';
+    }
     html += `<div class="order-card search-result-card" style="background:${statusColor}; cursor:pointer" data-order-id="${order.id}" data-mandoub-id="${order.mandoubId || ''}">
       <div style="display:flex;justify-content:space-between;align-items:start"><div style="flex:1">
-        <p style="font-weight:800;margin:0 0 5px">${order.company || 'غير معروف'}</p>
+        <p style="font-weight:800;margin:0 0 5px">${order.company || 'غير معروف'} ${priceChangeBadge}</p>
         <p style="margin:0 0 3px;font-size:12px">📋 الوصل: <span class="wasl-copyable" onclick="event.stopPropagation(); copyWaslNumber('${order.wasl||''}')" style="color:#fff;text-decoration:underline;text-decoration-style:dashed">${order.wasl||'لا يوجد'}</span></p>
         <p style="margin:0 0 3px;font-size:12px">🏍️ المندوب: <span style="font-weight:bold">${mandoubName}</span></p>
         <p style="margin:0 0 3px;font-size:12px">📍 ${order.area || 'غير معروف'} - ${order.gov || 'الأنبار'}</p>
@@ -1113,6 +1137,9 @@ window.rejectOrderWithReasons = async function(orderId) {
   }
 };
 
+// ==============================================
+// التعديل 2 و 3: دالة تغيير السعر مع صيغة الملاحظة وعرض السعر القديم والجديد
+// ==============================================
 async function handlePriceChange(orderId, order) {
   const { value: newPrice } = await Swal.fire({
     title: '💰 تغيير سعر الطلب',
@@ -1196,11 +1223,14 @@ async function handlePriceChange(orderId, order) {
 
   try {
     if (hasReturn === 'yes') {
+      // صيغة الملاحظة لتغير السعر مع وجود راجع
+      const priceChangeNote = `💰💰💰 تغير السعر من (${fmtN(oldAmountAbs)} دينار) إلى (${fmtN(newAmount)} دينار) مع وجود راجع بواسطة المندوب (${order.mandoubId || 'غير محدد'}) | تم التغيير بواسطة ${userName} في ${currentDateTime}`;
+      
       const deliveredOrder = { 
         ...order, 
         amount: newAmount, 
         status: 'delivered',
-        note: `💰💰💰 تغيير السعر من ${fmtN(oldAmountAbs)} دينار إلى ${fmtN(newAmount)} دينار مع وجود راجع | تم التغيير بواسطة ${userName} في ${currentDateTime}`,
+        note: priceChangeNote,
         createdAt: serverTimestamp(), 
         updatedAt: now,
         isNegative: false
@@ -1226,7 +1256,8 @@ async function handlePriceChange(orderId, order) {
         icon: 'success',
         title: '✅ تم تغيير السعر مع وجود راجع',
         html: `<div style="text-align:right">
-          <p>💰 السعر الجديد: <strong>${fmtN(newAmount)} دينار</strong> (تم تحويله إلى <strong>واصل</strong>)</p>
+          <p>💰 السعر القديم: <strong style="color:#dc2626">${fmtN(oldAmountAbs)} دينار</strong></p>
+          <p>💰 السعر الجديد: <strong style="color:#0d9488">${fmtN(newAmount)} دينار</strong> (تم تحويله إلى <strong>واصل</strong>)</p>
           <p>📦 فرق السعر: <strong>${fmtN(priceDifference)} دينار</strong> (تم تحويله إلى <strong>راجع مخزن</strong>)</p>
           <p>🆔 رقم الوصل الأصلي: <strong>${order.wasl || 'غير محدد'}</strong></p>
         </div>`,
@@ -1234,11 +1265,14 @@ async function handlePriceChange(orderId, order) {
       });
       
     } else {
+      // صيغة الملاحظة لتغير السعر بدون راجع
+      const priceChangeNote = `💰💰💰 تغير السعر من (${fmtN(oldAmountAbs)} دينار) إلى (${fmtN(newAmount)} دينار) بدون راجع بواسطة المندوب (${order.mandoubId || 'غير محدد'}) | تم التغيير بواسطة ${userName} في ${currentDateTime}`;
+      
       const updatedOrder = { 
         ...order,
         amount: newAmount,
         status: 'delivered',
-        note: `💰💰💰 تغيير السعر من ${fmtN(oldAmountAbs)} دينار إلى ${fmtN(newAmount)} دينار بدون راجع | تم التغيير بواسطة ${userName} في ${currentDateTime}`,
+        note: priceChangeNote,
         updatedAt: now,
         isNegative: false
       };
@@ -1249,8 +1283,8 @@ async function handlePriceChange(orderId, order) {
         icon: 'success',
         title: '✅ تم تغيير السعر بدون راجع',
         html: `<div style="text-align:right">
-          <p>💰 السعر القديم: <strong>${fmtN(oldAmountAbs)} دينار</strong></p>
-          <p>💰 السعر الجديد: <strong>${fmtN(newAmount)} دينار</strong></p>
+          <p>💰 السعر القديم: <strong style="color:#dc2626">${fmtN(oldAmountAbs)} دينار</strong></p>
+          <p>💰 السعر الجديد: <strong style="color:#0d9488">${fmtN(newAmount)} دينار</strong></p>
           <p>📋 تم تحديث الطلب إلى <strong>واصل</strong></p>
         </div>`,
         confirmButtonText: 'حسناً'
@@ -1534,16 +1568,16 @@ window.viewOrderDetails = async function(orderId) {
     const amountPrefix = order.amount < 0 ? '🔴' : '💰';
     Swal.fire({
       title: `تفاصيل الطلب: ${order.company}`,
-      html: `<div style="text-align:right;font-size:14px"><table style="width:100%;border-collapse:collapse">  <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📋 رقم الوصل:</strong> </td><td style="padding:8px;border-bottom:1px solid #e5e7eb"><span onclick="copyWaslNumber('${order.wasl || ''}')" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${order.wasl || 'لا يوجد'}</span><span style="font-size:11px;color:#6b7280;margin-right:8px">(اضغط للنسخ)</span>       </tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🏢 الشركة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.company}</tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📞 الهاتف:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb"><span onclick="showCustomerPhoneMenu('${order.customerPhone || ''}', event)" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${order.customerPhone}</span><span style="font-size:11px;color:#6b7280;margin-right:8px">(اضغط للخيارات)</span></tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📍 الموقع:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.area} - ${order.gov}</tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🏍️ المندوب:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${mandoubName}</tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>💰 المبلغ:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb"><span style="color:${amountColor};font-weight:bold">${amountPrefix} ${fmtN(Math.abs(order.amount))} دينار</span>${order.isNegative ? '<span style="background:#dc2626;color:white;padding:2px 5px;border-radius:4px;font-size:11px;margin-right:5px">سالب</span>' : ''}</tr>
-            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🎭 الحالة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${statusText(order.status)}</tr>
-            ${notes.length > 0 ? `<tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>⚠️ ملاحظات:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${notes.join('، ')}</tr>` : ''}
-            ${order.note ? `<tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>💬 ملاحظة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.note}</tr>` : ''}
-            <tr><td style="padding:8px"><strong>📅 التاريخ:</strong></td><td style="padding:8px">${formatDateTime(order.createdAt)}</tr>
+      html: `<div style="text-align:right;font-size:14px"><table style="width:100%;border-collapse:collapse">  <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📋 رقم الوصل:</strong> </td><td style="padding:8px;border-bottom:1px solid #e5e7eb"><span onclick="copyWaslNumber('${order.wasl || ''}')" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${order.wasl || 'لا يوجد'}</span><span style="font-size:11px;color:#6b7280;margin-right:8px">(اضغط للنسخ)</span>       </td>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🏢 الشركة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.company}</td>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📞 الهاتف:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb"><span onclick="showCustomerPhoneMenu('${order.customerPhone || ''}', event)" style="cursor:pointer;color:#3b82f6;text-decoration:underline">${order.customerPhone}</span><span style="font-size:11px;color:#6b7280;margin-right:8px">(اضغط للخيارات)</span></td>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>📍 الموقع:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.area} - ${order.gov}</td>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🏍️ المندوب:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${mandoubName}</td>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>💰 المبلغ:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb"><span style="color:${amountColor};font-weight:bold">${amountPrefix} ${fmtN(Math.abs(order.amount))} دينار</span>${order.isNegative ? '<span style="background:#dc2626;color:white;padding:2px 5px;border-radius:4px;font-size:11px;margin-right:5px">سالب</span>' : ''}</td>
+            <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>🎭 الحالة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${statusText(order.status)}</td>
+            ${notes.length > 0 ? `<tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>⚠️ ملاحظات:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${notes.join('، ')}</td></tr>` : ''}
+            ${order.note ? `<tr><td style="padding:8px;border-bottom:1px solid #e5e7eb"><strong>💬 ملاحظة:</strong></td><td style="padding:8px;border-bottom:1px solid #e5e7eb">${order.note}</td></tr>` : ''}
+            <tr><td style="padding:8px"><strong>📅 التاريخ:</strong></td><td style="padding:8px">${formatDateTime(order.createdAt)}</td></tr>
            ⇂/table></div>`,
       width: 600,
       showCloseButton: true,
@@ -1648,7 +1682,19 @@ window.filterMandoubOrders = async function(mandoubId, status) {
       const cardClass = hasSpecialNotes ? 'order-card warning-card' : 'order-card';
       const amountColor = order.amount < 0 ? '#dc2626' : '#0d9488';
       const amountPrefix = order.amount < 0 ? '🔴' : '💰';
-      html += `<div class="${cardClass}" style="background:${statusColor}" data-order-id="${docSnap.id}">${hasSpecialNotes ? '<div class="warning-badge">⚠️</div>' : ''}<div style="display:flex;justify-content:space-between;align-items:start"><div style="flex:1"><p style="font-weight:800;margin:0 0 5px">${order.company || 'غير معروف'}</p><p style="margin:0 0 3px;font-size:12px">📋 الوصل: <span class="wasl-copyable" onclick="copyWaslNumber('${order.wasl || ''}')" style="color:#fff;text-decoration:underline;text-decoration-style:dashed">${order.wasl || 'لا يوجد'}</span></p><p style="margin:0 0 3px;font-size:12px">📍 ${order.area || 'غير معروف'} - ${order.gov || 'الأنبار'}</p><p style="margin:0 0 3px;font-size:12px">📞 <span class="phone-clickable" onclick="showCustomerPhoneMenu('${order.customerPhone || ''}', event)" style="color:#fff;text-decoration:underline;text-decoration-style:dotted">${order.customerPhone || 'لا يوجد'}</span></p><p style="margin:0 0 3px;font-size:12px"><span style="color:${amountColor};font-weight:bold">${amountPrefix} ${fmtN(Math.abs(Number(order.amount || 0)))} د.ع</span>${order.isNegative ? '<span style="background:#dc2626;color:white;padding:2px 5px;border-radius:4px;font-size:9px;margin-right:5px">سالب</span>' : ''}</p><p style="margin:0 0 3px;font-size:12px">🎭 ${statusText(order.status)}</p><p style="margin:0 0 3px;font-size:11px;opacity:0.9">📅 أُضيف: ${createdAt}</p><p style="margin:0 0 5px;font-size:11px;opacity:0.9">🔄 آخر تحديث: ${updatedAt}</p>${order.notes_fragile || order.notes_urgent || order.notes_no_open ? `<div class="notes-badges">${order.notes_fragile ? '<span class="notes-badge notes-fragile">⚡ قابل للكسر</span>' : ''}${order.notes_urgent ? '<span class="notes-badge notes-urgent">🚨 مستعجل</span>' : ''}${order.notes_no_open ? '<span class="notes-badge notes-no-open">⛔ عدم فتح</span>' : ''}</div>` : ''}${order.note ? `<p style="margin:5px 0 0;padding:5px;background:rgba(0,0,0,0.2);border-radius:5px;font-size:11px">📝 ${order.note}</p>` : ''}</div></div><div class="actions" style="margin-top:8px">${order.status === 'pending' ? `<button onclick="updateOrderStatus('${docSnap.id}','delivered')" class="btnx btnx-green">✅ واصل</button><button onclick="updateOrderStatus('${docSnap.id}','delayed')" class="btnx btnx-yellow">⏳ مؤجل</button><button onclick="rejectOrderWithReasons('${docSnap.id}')" class="btnx btnx-red">❌ رفض</button><button onclick="editOrderFull('${docSnap.id}')" class="btnx btnx-blue">✏️ تعديل</button><button onclick="transferOrder('${docSnap.id}')" class="btnx btnx-purple">🔄 تحويل</button><button onclick="deleteOrder('${docSnap.id}')" class="btnx btnx-red">🗑️ حذف</button>` : ''}${order.status === 'delivered' ? `<button onclick="rejectOrderWithReasons('${docSnap.id}')" class="btnx btnx-red">❌ رفض</button><button onclick="updateOrderStatus('${docSnap.id}','delayed')" class="btnx btnx-yellow">⏳ مؤجل</button><button onclick="transferOrder('${docSnap.id}')" class="btnx btnx-purple">🔄 تحويل</button><button onclick="editOrderFull('${docSnap.id}')" class="btnx btnx-blue">✏️ تعديل</button><button onclick="deleteOrder('${docSnap.id}')" class="btnx btnx-red">🗑️ حذف</button>` : ''}${order.status === 'delayed' ? `<button onclick="updateOrderStatus('${docSnap.id}','delivered')" class="btnx btnx-green">✅ واصل</button><button onclick="rejectOrderWithReasons('${docSnap.id}')" class="btnx btnx-red">❌ رفض</button><button onclick="transferOrder('${docSnap.id}')" class="btnx btnx-purple">🔄 تحويل</button><button onclick="editOrderFull('${docSnap.id}')" class="btnx btnx-blue">✏️ تعديل</button><button onclick="deleteOrder('${docSnap.id}')" class="btnx btnx-red">🗑️ حذف</button>` : ''}${order.status === 'rejected' ? `<button onclick="updateOrderStatus('${docSnap.id}','delivered')" class="btnx btnx-green">✅ واصل</button><button onclick="updateOrderStatus('${docSnap.id}','delayed')" class="btnx btnx-yellow">⏳ مؤجل</button><button onclick="transferOrder('${docSnap.id}')" class="btnx btnx-purple">🔄 تحويل</button><button onclick="editOrderFull('${docSnap.id}')" class="btnx btnx-blue">✏️ تعديل</button><button onclick="deleteOrder('${docSnap.id}')" class="btnx btnx-red">🗑️ حذف</button><button onclick="returnToPending('${docSnap.id}')" class="btnx" style="background:#f97316;color:white">↩️ ارجاعه قيد</button><button onclick="returnToWarehouse('${docSnap.id}')" class="btnx btnx-teal">📦 سحب راجع</button>` : ''}${order.status === 'temp' ? `<button onclick="approveTempOrder('${docSnap.id}')" class="btnx btnx-green">✅ تطبيق القرار</button><button onclick="backToPending('${docSnap.id}')" class="btnx btnx-gray">↩️ قيد التنفيذ</button>` : ''}</div></div>`;
+      
+      // عرض ملاحظة تغير السعر في بطاقة الطلب
+      let priceChangeBadge = '';
+      let priceChangeText = '';
+      if (order.note && (order.note.includes('تغير السعر') || order.note.includes('💰'))) {
+        priceChangeBadge = '<span style="background:#fbbf24;color:#111;padding:2px 6px;border-radius:4px;font-size:10px;margin-right:5px">💰 تغير السعر</span>';
+        const match = order.note.match(/تغير السعر من \(([^)]+)\) إلى \(([^)]+)\)/);
+        if (match) {
+          priceChangeText = `<p style="margin:3px 0;font-size:11px;background:rgba(0,0,0,0.2);padding:3px 6px;border-radius:4px">💰 السعر القديم: ${match[1]} → السعر الجديد: ${match[2]}</p>`;
+        }
+      }
+      
+      html += `<div class="${cardClass}" style="background:${statusColor}" data-order-id="${docSnap.id}">${hasSpecialNotes ? '<div class="warning-badge">⚠️</div>' : ''}<div style="display:flex;justify-content:space-between;align-items:start"><div style="flex:1"><p style="font-weight:800;margin:0 0 5px">${order.company || 'غير معروف'} ${priceChangeBadge}</p><p style="margin:0 0 3px;font-size:12px">📋 الوصل: <span class="wasl-copyable" onclick="copyWaslNumber('${order.wasl || ''}')" style="color:#fff;text-decoration:underline;text-decoration-style:dashed">${order.wasl || 'لا يوجد'}</span></p><p style="margin:0 0 3px;font-size:12px">📍 ${order.area || 'غير معروف'} - ${order.gov || 'الأنبار'}</p><p style="margin:0 0 3px;font-size:12px">📞 <span class="phone-clickable" onclick="showCustomerPhoneMenu('${order.customerPhone || ''}', event)" style="color:#fff;text-decoration:underline;text-decoration-style:dotted">${order.customerPhone || 'لا يوجد'}</span></p><p style="margin:0 0 3px;font-size:12px"><span style="color:${amountColor};font-weight:bold">${amountPrefix} ${fmtN(Math.abs(Number(order.amount || 0)))} د.ع</span>${order.isNegative ? '<span style="background:#dc2626;color:white;padding:2px 5px;border-radius:4px;font-size:9px;margin-right:5px">سالب</span>' : ''}</p><p style="margin:0 0 3px;font-size:12px">🎭 ${statusText(order.status)}</p><p style="margin:0 0 3px;font-size:11px;opacity:0.9">📅 أُضيف: ${createdAt}</p><p style="margin:0 0 5px;font-size:11px;opacity:0.9">🔄 آخر تحديث: ${updatedAt}</p>${priceChangeText}${order.notes_fragile || order.notes_urgent || order.notes_no_open ? `<div class="notes-badges">${order.notes_fragile ? '<span class="notes-badge notes-fragile">⚡ قابل للكسر</span>' : ''}${order.notes_urgent ? '<span class="notes-badge notes-urgent">🚨 مستعجل</span>' : ''}${order.notes_no_open ? '<span class="notes-badge notes-no-open">⛔ عدم فتح</span>' : ''}</div>` : ''}${order.note ? `<p style="margin:5px 0 0;padding:5px;background:rgba(0,0,0,0.2);border-radius:5px;font-size:11px">📝 ${order.note}</p>` : ''}</div></div><div class="actions" style="margin-top:8px">${order.status === 'pending' ? `<button onclick="updateOrderStatus('${docSnap.id}','delivered')" class="btnx btnx-green">✅ واصل</button><button onclick="updateOrderStatus('${docSnap.id}','delayed')" class="btnx btnx-yellow">⏳ مؤجل</button><button onclick="rejectOrderWithReasons('${docSnap.id}')" class="btnx btnx-red">❌ رفض</button><button onclick="editOrderFull('${docSnap.id}')" class="btnx btnx-blue">✏️ تعديل</button><button onclick="transferOrder('${docSnap.id}')" class="btnx btnx-purple">🔄 تحويل</button><button onclick="deleteOrder('${docSnap.id}')" class="btnx btnx-red">🗑️ حذف</button>` : ''}${order.status === 'delivered' ? `<button onclick="rejectOrderWithReasons('${docSnap.id}')" class="btnx btnx-red">❌ رفض</button><button onclick="updateOrderStatus('${docSnap.id}','delayed')" class="btnx btnx-yellow">⏳ مؤجل</button><button onclick="transferOrder('${docSnap.id}')" class="btnx btnx-purple">🔄 تحويل</button><button onclick="editOrderFull('${docSnap.id}')" class="btnx btnx-blue">✏️ تعديل</button><button onclick="deleteOrder('${docSnap.id}')" class="btnx btnx-red">🗑️ حذف</button>` : ''}${order.status === 'delayed' ? `<button onclick="updateOrderStatus('${docSnap.id}','delivered')" class="btnx btnx-green">✅ واصل</button><button onclick="rejectOrderWithReasons('${docSnap.id}')" class="btnx btnx-red">❌ رفض</button><button onclick="transferOrder('${docSnap.id}')" class="btnx btnx-purple">🔄 تحويل</button><button onclick="editOrderFull('${docSnap.id}')" class="btnx btnx-blue">✏️ تعديل</button><button onclick="deleteOrder('${docSnap.id}')" class="btnx btnx-red">🗑️ حذف</button>` : ''}${order.status === 'rejected' ? `<button onclick="updateOrderStatus('${docSnap.id}','delivered')" class="btnx btnx-green">✅ واصل</button><button onclick="updateOrderStatus('${docSnap.id}','delayed')" class="btnx btnx-yellow">⏳ مؤجل</button><button onclick="transferOrder('${docSnap.id}')" class="btnx btnx-purple">🔄 تحويل</button><button onclick="editOrderFull('${docSnap.id}')" class="btnx btnx-blue">✏️ تعديل</button><button onclick="deleteOrder('${docSnap.id}')" class="btnx btnx-red">🗑️ حذف</button><button onclick="returnToPending('${docSnap.id}')" class="btnx" style="background:#f97316;color:white">↩️ ارجاعه قيد</button><button onclick="returnToWarehouse('${docSnap.id}')" class="btnx btnx-teal">📦 سحب راجع</button>` : ''}${order.status === 'temp' ? `<button onclick="approveTempOrder('${docSnap.id}')" class="btnx btnx-green">✅ تطبيق القرار</button><button onclick="backToPending('${docSnap.id}')" class="btnx btnx-gray">↩️ قيد التنفيذ</button>` : ''}</div></div>`;
     });
   }
   html += '</div>';
